@@ -1,5 +1,5 @@
 import { initializeDatabase } from '@/db/schema';
-import { getAllAccounts, createAccount } from '@/backend/services/accounts.service';
+import { getAllAccounts, createAccount, seedStandardAccounts } from '@/backend/services/accounts.service';
 import { successResponse, errorResponse } from '@/backend/utils/response';
 
 // GET /api/accounts
@@ -18,6 +18,12 @@ export async function POST(request) {
   try {
     await initializeDatabase();
     const body = await request.json();
+
+    if (body.action === 'seed') {
+      const result = await seedStandardAccounts();
+      return successResponse(result, 201);
+    }
+
     const result = await createAccount(body);
     return successResponse(result, 201);
   } catch (error) {

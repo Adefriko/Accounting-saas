@@ -5,12 +5,31 @@ import {
   queryAccountByName,
   queryDeleteAccount
 } from '@/db/queries/accounts';
+import { queryAllTransactions } from '@/db/queries/transactions';
 
 /**
- * Service mengambil semua akun
+ * Service mengambil semua akun lengkap dengan kalkulasi saldo berjalan dari riwayat transaksi DB
  */
 export async function getAllAccounts() {
-  return await queryAllAccounts();
+  const [accounts, transactions] = await Promise.all([
+    queryAllAccounts(),
+    queryAllTransactions()
+  ]);
+
+  return accounts.map(acc => {
+    let sumDebit = 0;
+    let sumCredit = 0;
+    for (const tx of transactions) {
+      if (tx.debit === acc.account) sumDebit += tx.amount;
+      if (tx.credit === acc.account) sumCredit += tx.amount;
+    }
+    const isDebitNormal = ['Asset', 'Expense', 'COGS'].includes(acc.type);
+    const balance = isDebitNormal ? (sumDebit - sumCredit) : (sumCredit - sumDebit);
+    return {
+      ...acc,
+      balance
+    };
+  });
 }
 
 /**
@@ -33,6 +52,38 @@ export async function createAccount({ account, type }) {
 
   await queryInsertAccount(trimmedName, type);
   return { message: `Akun '${trimmedName}' berhasil ditambahkan!` };
+}
+
+/**
+ * Service memasukkan daftar akun standar akuntansi secara otomatis (Template Starter)
+ */
+export async function seedStandardAccounts() {
+  const defaultAccounts = [
+    { account: 'Kas', type: 'Asset' },
+    { account: 'Bank BCA', type: 'Asset' },
+    { account: 'Piutang Usaha', type: 'Asset' },
+    { account: 'Peralatan Usaha', type: 'Asset' },
+    { account: 'Utang Usaha', type: 'Liability' },
+    { account: 'Modal Pemilik', type: 'Equity' },
+    { account: 'Pendapatan Jasa', type: 'Revenue' },
+    { account: 'Pendapatan Lainnya', type: 'Revenue' },
+    { account: 'Beban Perlengkapan', type: 'Expense' },
+    { account: 'Beban Sewa', type: 'Expense' },
+    { account: 'Beban Listrik dan Air', type: 'Expense' }
+  ];
+
+  const existing = await queryAllAccounts();
+  const existingNames = new Set(existing.map(a => a.account));
+
+  let added = 0;
+  for (const item of defaultAccounts) {
+    if (!existingNames.has(item.account)) {
+      await queryInsertAccount(item.account, item.type);
+      added++;
+    }
+  }
+
+  return { message: `Berhasil menambahkan ${added} akun standar ke database!` };
 }
 
 /**

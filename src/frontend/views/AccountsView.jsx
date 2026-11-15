@@ -8,15 +8,17 @@ import {
   RotateCcw, 
   Info, 
   AlertTriangle,
-  X
+  Sparkles
 } from 'lucide-react';
+import { formatRupiah } from '@/frontend/utils/formatters';
 import Modal from '@/frontend/components/Modal';
 
 export default function AccountsView({ 
   accounts = [], 
   onAddAccount, 
   onDeleteAccount, 
-  onResetDatabase 
+  onResetDatabase,
+  onSeedStandardAccounts
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,6 +81,13 @@ export default function AccountsView({
         </div>
 
         <div className="page-actions">
+          {accounts.length === 0 && onSeedStandardAccounts && (
+            <button onClick={onSeedStandardAccounts} className="btn-moneva-outline" title="Gunakan daftar akun dasar siap pakai">
+              <Sparkles size={15} style={{ color: 'var(--brand-teal)' }} />
+              <span>Gunakan Akun Standar</span>
+            </button>
+          )}
+
           <button onClick={() => setIsModalOpen(true)} className="btn-moneva-primary">
             <Plus size={16} />
             <span>Tambah Akun</span>
@@ -89,7 +98,7 @@ export default function AccountsView({
       {/* Info Alert Box */}
       <div className="info-alert-box">
         <Info size={18} style={{ flexShrink: 0 }} />
-        <span>Daftar akun mengikuti kategori dasar: Aset, Liabilitas, Ekuitas, Pendapatan, dan Beban. Klik aksi hapus jika akun salah dibuat.</span>
+        <span>Daftar akun mengikuti kategori dasar: Aset, Liabilitas, Ekuitas, Pendapatan, dan Beban. Saldo berjalan terhitung otomatis dari seluruh mutasi jurnal di database.</span>
       </div>
 
       {/* Main Content Card */}
@@ -122,7 +131,7 @@ export default function AccountsView({
             <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Cari nama akun..."
+              placeholder="Cari kode atau nama akun..."
               className="form-input-moneva"
               style={{ paddingLeft: 40 }}
               value={searchTerm}
@@ -159,12 +168,13 @@ export default function AccountsView({
           <table className="moneva-table">
             <thead>
               <tr>
-                <th style={{ width: 100 }}>KODE</th>
+                <th style={{ width: 90 }}>KODE</th>
                 <th>NAMA AKUN</th>
                 <th>KATEGORI</th>
                 <th>SALDO NORMAL</th>
                 <th>STATUS</th>
-                <th className="text-center" style={{ width: 100 }}>AKSI</th>
+                <th className="text-right">SALDO BERJALAN</th>
+                <th className="text-center" style={{ width: 90 }}>AKSI</th>
               </tr>
             </thead>
             <tbody>
@@ -194,6 +204,9 @@ export default function AccountsView({
                         <span className="dot-indicator" /> Aktif
                       </span>
                     </td>
+                    <td className="text-right" style={{ fontWeight: 700, color: 'var(--text-dark)' }}>
+                      {formatRupiah(acc.balance || 0)}
+                    </td>
                     <td className="text-center">
                       <button
                         onClick={() => onDeleteAccount(acc.account)}
@@ -207,8 +220,8 @@ export default function AccountsView({
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
-                    Belum ada akun ditemukan. Klik tombol <strong>+ Tambah Akun</strong> di atas untuk membuat akun baru.
+                  <td colSpan="7" style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
+                    Belum ada akun di database. Klik tombol <strong>+ Tambah Akun</strong> atau <strong>Gunakan Akun Standar</strong> di atas.
                   </td>
                 </tr>
               )}
@@ -219,11 +232,11 @@ export default function AccountsView({
         {/* Table Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, fontSize: 12, color: 'var(--text-muted)' }}>
           <span>Menampilkan {filteredAccounts.length} dari {accounts.length} akun</span>
-          <span>Data terhubung · Neon PostgreSQL</span>
+          <span>Data terhubung langsung ke Neon PostgreSQL Cloud DB</span>
         </div>
       </div>
 
-      {/* Danger Zone Accordion / Clean Box */}
+      {/* Danger Zone */}
       <div style={{ background: '#fff', border: '1px solid #fee2e2', borderRadius: 'var(--radius-lg)', padding: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#b91c1c', fontWeight: 700, fontSize: 14 }}>
@@ -246,7 +259,7 @@ export default function AccountsView({
               <label className="form-label">Nama Akun</label>
               <input
                 type="text"
-                placeholder="Contoh: Kas Utama, Piutang Usaha, dll."
+                placeholder="Contoh: Kas Utama, Bank BCA, Piutang Usaha..."
                 className="form-input-moneva"
                 value={newAccount.account}
                 onChange={e => setNewAccount({ ...newAccount, account: e.target.value })}
@@ -262,7 +275,7 @@ export default function AccountsView({
                 value={newAccount.type}
                 onChange={e => setNewAccount({ ...newAccount, type: e.target.value })}
               >
-                <option value="Asset">Asset (Aset / Harta / Kas)</option>
+                <option value="Asset">Asset (Aset / Harta / Kas / Bank)</option>
                 <option value="Liability">Liability (Liabilitas / Utang)</option>
                 <option value="Equity">Equity (Ekuitas / Modal)</option>
                 <option value="Revenue">Revenue (Pendapatan)</option>
@@ -277,7 +290,7 @@ export default function AccountsView({
               Batal
             </button>
             <button type="submit" className="btn-moneva-primary">
-              Simpan Akun
+              Simpan Akun ke Database
             </button>
           </div>
         </form>

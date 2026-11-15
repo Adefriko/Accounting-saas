@@ -7,11 +7,13 @@ import {
   Wallet, 
   Plus, 
   ArrowUpRight, 
+  ArrowDownRight,
   Info, 
   ChevronRight,
   BookOpen,
   FileSpreadsheet,
-  Calendar
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -21,33 +23,38 @@ import { formatRupiah } from '@/frontend/utils/formatters';
 export default function DashboardView({ 
   data, 
   transactions = [],
+  accounts = [],
   onOpenNewJournal, 
-  onNavigate 
+  onNavigate,
+  onSeedStandardAccounts
 }) {
-  const monthlyData = data?.monthly_data || [];
-  const latestMonth = monthlyData[monthlyData.length - 1] || {};
+  const totalRevenue = data?.total_revenue || 0;
+  const totalExpense = data?.total_expense || 0;
+  const netProfit = data?.net_profit || 0;
+  const cashAvailable = data?.cash_available || 0;
+  const revenueGrowth = data?.revenue_growth_mom || 0;
+  const expenseGrowth = data?.expense_growth_mom || 0;
+  const profitMargin = data?.profit_margin ? Number(data.profit_margin).toFixed(1) : '0.0';
+  const targetPercent = data?.target_cash_percent ? Number(data.target_cash_percent).toFixed(1) : '0.0';
 
-  const totalRevenue = latestMonth.Revenue || 0;
-  const totalExpense = latestMonth.Expense || 0;
-  const netProfit = latestMonth.NetProfit || (totalRevenue - totalExpense);
-  const cashAvailable = latestMonth.CashIn ? (latestMonth.CashIn - (latestMonth.CashOut || 0)) : (totalRevenue * 1.5);
+  // Chart data directly from DB monthly aggregation
+  const chartData = (data?.chart_data && data.chart_data.length > 0)
+    ? data.chart_data
+    : [
+        { name: 'Jan', pemasukan: 0, pengeluaran: 0 },
+        { name: 'Feb', pemasukan: 0, pengeluaran: 0 },
+        { name: 'Mar', pemasukan: 0, pengeluaran: 0 },
+        { name: 'Apr', pemasukan: 0, pengeluaran: 0 },
+        { name: 'Mei', pemasukan: 0, pengeluaran: 0 },
+        { name: 'Jun', pemasukan: 0, pengeluaran: 0 },
+        { name: 'Jul', pemasukan: 0, pengeluaran: 0 }
+      ];
 
-  // Chart data simulation or actual monthly data
-  const chartData = monthlyData.length > 0 ? monthlyData.map(m => ({
-    name: m.Month.split('-')[0],
-    pemasukan: m.Revenue || m.CashIn || 0,
-    pengeluaran: m.Expense || m.CashOut || 0
-  })) : [
-    { name: 'Mei', pemasukan: 13000000, pengeluaran: 7200000 },
-    { name: 'Jun', pemasukan: 16500000, pengeluaran: 8100000 },
-    { name: 'Jul', pemasukan: 15200000, pengeluaran: 8500000 },
-    { name: 'Agu', pemasukan: 19800000, pengeluaran: 9400000 },
-    { name: 'Sep', pemasukan: 18500000, pengeluaran: 9100000 },
-    { name: 'Okt', pemasukan: 22400000, pengeluaran: 9900000 },
-    { name: 'Nov', pemasukan: 28450000, pengeluaran: 11270000 }
-  ];
+  const recentTransactions = (data?.recent_transactions && data.recent_transactions.length > 0)
+    ? data.recent_transactions
+    : transactions.slice(0, 4);
 
-  const recentTransactions = transactions.slice(0, 4);
+  const isCashHealthy = cashAvailable >= 0;
 
   return (
     <div>
@@ -56,7 +63,7 @@ export default function DashboardView({
         <div className="page-header-text">
           <span className="super-tag">Hai, pengelola usaha! 👋</span>
           <h1 className="page-title">Keuangan usahamu, makin jelas.</h1>
-          <p className="page-subtitle">Pantau pemasukan, pengeluaran, dan aktivitas usahamu di satu tempat.</p>
+          <p className="page-subtitle">Pantau pemasukan, pengeluaran, dan aktivitas usahamu di satu tempat langsung dari database cloud.</p>
         </div>
 
         <div className="page-actions">
@@ -72,7 +79,25 @@ export default function DashboardView({
         </div>
       </div>
 
-      {/* 4 Metric Cards Row */}
+      {/* Empty Database Prompt if fresh DB */}
+      {accounts.length === 0 && (
+        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-lg)', padding: '16px 20px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Sparkles size={22} style={{ color: '#16a34a' }} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: '#15803d' }}>Database Baru Terdeteksi</div>
+              <div style={{ fontSize: 12.5, color: '#166534' }}>Mulai dengan membuat akun keuangan Anda atau gunakan paket template akun standar.</div>
+            </div>
+          </div>
+          {onSeedStandardAccounts && (
+            <button onClick={onSeedStandardAccounts} className="btn-moneva-primary" style={{ background: '#16a34a' }}>
+              Gunakan Akun Standar Siap Pakai
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 4 Metric Cards Row (100% Real DB Data) */}
       <div className="metrics-row-moneva">
         {/* Card 1: Total Pemasukan */}
         <div className="metric-card-moneva">
@@ -80,11 +105,12 @@ export default function DashboardView({
             <div className="metric-icon-circle metric-icon-teal">
               <TrendingUp size={20} />
             </div>
-            <span className="trend-badge trend-badge-teal">
-              <ArrowUpRight size={12} /> 12,8%
+            <span className={`trend-badge ${revenueGrowth >= 0 ? 'trend-badge-teal' : 'trend-badge-rose'}`}>
+              {revenueGrowth >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+              {Math.abs(revenueGrowth).toFixed(1)}%
             </span>
           </div>
-          <div className="metric-value-moneva">{formatRupiah(totalRevenue || 28450000)}</div>
+          <div className="metric-value-moneva">{formatRupiah(totalRevenue)}</div>
           <div className="metric-desc-moneva">Total pemasukan</div>
         </div>
 
@@ -94,11 +120,12 @@ export default function DashboardView({
             <div className="metric-icon-circle metric-icon-orange">
               <Receipt size={20} />
             </div>
-            <span className="trend-badge trend-badge-orange">
-              <ArrowUpRight size={12} /> 5,2%
+            <span className={`trend-badge ${expenseGrowth >= 0 ? 'trend-badge-orange' : 'trend-badge-teal'}`}>
+              {expenseGrowth >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+              {Math.abs(expenseGrowth).toFixed(1)}%
             </span>
           </div>
-          <div className="metric-value-moneva">{formatRupiah(totalExpense || 11270000)}</div>
+          <div className="metric-value-moneva">{formatRupiah(totalExpense)}</div>
           <div className="metric-desc-moneva">Total pengeluaran</div>
         </div>
 
@@ -109,10 +136,12 @@ export default function DashboardView({
               <CreditCard size={20} />
             </div>
             <span className="trend-badge trend-badge-teal">
-              <ArrowUpRight size={12} /> 16,4%
+              Margin: {profitMargin}%
             </span>
           </div>
-          <div className="metric-value-moneva">{formatRupiah(netProfit || 17180000)}</div>
+          <div className="metric-value-moneva" style={{ color: netProfit >= 0 ? 'var(--text-dark)' : 'var(--brand-rose)' }}>
+            {formatRupiah(netProfit)}
+          </div>
           <div className="metric-desc-moneva">Laba bersih</div>
         </div>
 
@@ -122,12 +151,12 @@ export default function DashboardView({
             <div className="metric-icon-circle metric-icon-purple">
               <Wallet size={20} />
             </div>
-            <span className="trend-badge trend-badge-teal">
-              <ArrowUpRight size={12} /> 8,0%
+            <span className={`trend-badge ${isCashHealthy ? 'trend-badge-teal' : 'trend-badge-rose'}`}>
+              {targetPercent}% Target
             </span>
           </div>
-          <div className="metric-value-moneva">{formatRupiah(cashAvailable || 42850000)}</div>
-          <div className="metric-desc-moneva">Kas tersedia</div>
+          <div className="metric-value-moneva">{formatRupiah(cashAvailable)}</div>
+          <div className="metric-desc-moneva">Kas tersedia (Saldo Aktiva)</div>
         </div>
       </div>
 
@@ -147,7 +176,7 @@ export default function DashboardView({
             </div>
           </div>
           <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>
-            Perbandingan uang masuk dan keluar selama 7 bulan
+            Perbandingan uang masuk dan keluar dari database transaksi
           </p>
 
           <div style={{ width: '100%', height: 230 }}>
@@ -165,8 +194,12 @@ export default function DashboardView({
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }}
-                  tickFormatter={v => `${(v / 1000000).toFixed(0)} jt`} />
+                <YAxis 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tick={{ fill: '#94a3b8', fontSize: 11 }}
+                  tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(0)} jt` : v} 
+                />
                 <Tooltip 
                   formatter={(val) => formatRupiah(val)}
                   contentStyle={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
@@ -183,8 +216,8 @@ export default function DashboardView({
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Ringkasan kas</h3>
-              <span className="status-pill status-pill-active">
-                <span className="dot-indicator" /> Sehat
+              <span className={`status-pill ${isCashHealthy ? 'status-pill-active' : 'status-pill-cogs'}`}>
+                <span className="dot-indicator" /> {isCashHealthy ? 'Sehat' : 'Perlu Perhatian'}
               </span>
             </div>
             <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
@@ -197,16 +230,16 @@ export default function DashboardView({
                 Kas tersedia
               </div>
               <div style={{ fontSize: 24, fontWeight: 800, color: '#004d40', margin: '4px 0 10px' }}>
-                {formatRupiah(cashAvailable || 42850000)}
+                {formatRupiah(cashAvailable)}
               </div>
               <div style={{ fontSize: 11.5, color: '#006d5b', marginBottom: 6 }}>
                 Sasaran kas operasional: Rp 50.000.000
               </div>
               <div style={{ width: '100%', height: 7, background: 'rgba(0, 109, 91, 0.15)', borderRadius: 10, overflow: 'hidden' }}>
-                <div style={{ width: '85.7%', height: '100%', background: '#006d5b', borderRadius: 10 }} />
+                <div style={{ width: `${Math.min(100, Math.max(0, targetPercent))}%`, height: '100%', background: '#006d5b', borderRadius: 10 }} />
               </div>
               <div style={{ fontSize: 11, color: '#006d5b', fontWeight: 600, marginTop: 6 }}>
-                85,7% dari target
+                {targetPercent}% dari target
               </div>
             </div>
 
@@ -252,7 +285,7 @@ export default function DashboardView({
             </button>
           </div>
           <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
-            Catatan transaksi yang baru ditambahkan
+            Catatan transaksi yang baru ditambahkan ke database
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -277,7 +310,7 @@ export default function DashboardView({
                         {tx.description || `${tx.debit} ➔ ${tx.credit}`}
                       </div>
                       <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                        {tx.debit} · {tx.date}
+                        [D] {tx.debit} · {tx.date}
                       </div>
                     </div>
                   </div>
@@ -287,47 +320,9 @@ export default function DashboardView({
                 </div>
               ))
             ) : (
-              /* Sample Mock Transactions from Reference */
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <TrendingUp size={16} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-dark)' }}>Penerimaan layanan deep clean</div>
-                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Pemasukan / Transfer · 14 Nov 2026</div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#15803d' }}>+ Rp 375.000</div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#ffedd5', color: '#ea580c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Receipt size={16} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-dark)' }}>Pembelian cairan pembersih</div>
-                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Pengeluaran · 13 Nov 2026</div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#ea580c' }}>- Rp 185.000</div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <TrendingUp size={16} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-dark)' }}>Penerimaan paket express</div>
-                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Pemasukan / Transfer · 12 Nov 2026</div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#15803d' }}>+ Rp 225.000</div>
-                </div>
-              </>
+              <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+                Belum ada transaksi di database. Klik <strong>Catat jurnal baru</strong> di samping untuk memulai.
+              </div>
             )}
           </div>
         </div>

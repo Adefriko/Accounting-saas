@@ -78,16 +78,17 @@ export default function ReportsView({
     }
   };
 
-  // Derive highlight numbers for Laba Rugi sorotan
-  const pnlRows = incomeStatementData?.rows || [];
-  const revRow = pnlRows.find(r => r.Kategori === 'Revenue');
-  const expRow = pnlRows.find(r => r.Kategori === 'Operating Expenses');
-  const netRow = pnlRows.find(r => r.Kategori === 'Net Profit');
+  // 100% Real DB Data for Laba Rugi
+  const revenueAccounts = incomeStatementData?.revenue_accounts || [];
+  const expenseAccounts = incomeStatementData?.expense_accounts || [];
+  const cogsAccounts = incomeStatementData?.cogs_accounts || [];
 
-  const totalRevenue = revRow ? (revRow['Full Year'] || revRow['NOV'] || 28450000) : 28450000;
-  const totalExpense = expRow ? (expRow['Full Year'] || expRow['NOV'] || 11270000) : 11270000;
-  const netProfit = netRow ? (netRow['Full Year'] || netRow['NOV'] || 17180000) : (totalRevenue - totalExpense);
-  const marginPercent = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : '60.4';
+  const totalRevenue = incomeStatementData?.total_revenue || 0;
+  const totalExpense = (incomeStatementData?.total_expense || 0) + (incomeStatementData?.total_cogs || 0);
+  const netProfit = incomeStatementData?.net_profit || 0;
+  const netMargin = incomeStatementData?.net_margin || '0.0';
+
+  const expenseRatio = totalRevenue > 0 ? Math.min(100, (totalExpense / totalRevenue) * 100) : 0;
 
   return (
     <div>
@@ -153,7 +154,7 @@ export default function ReportsView({
       {/* TAB 1: LABA RUGI (Matches Reference 04-Laporan-Keuangan-Desktop.png) */}
       {activeReportTab === 'Laba Rugi' && (
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr', gap: 24 }}>
-          {/* Left Column: Laporan Laba Rugi Breakdown */}
+          {/* Left Column: Laporan Laba Rugi Breakdown Real DB Data */}
           <div className="moneva-card" style={{ marginBottom: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
               <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-dark)' }}>Laporan Laba Rugi</h3>
@@ -161,7 +162,7 @@ export default function ReportsView({
                 <span className="dot-indicator" /> Ringkasan
               </span>
             </div>
-            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Periode November 2026</p>
+            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Akumulasi Periode Berjalan dari Database</p>
 
             {/* Section 1: Pendapatan */}
             <div style={{ marginBottom: 20 }}>
@@ -169,14 +170,18 @@ export default function ReportsView({
                 Pendapatan
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '0 14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
-                  <span>Pendapatan jasa operasional</span>
-                  <span style={{ fontWeight: 600 }}>{formatRupiah(totalRevenue * 0.95)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
-                  <span>Pendapatan lain-lain</span>
-                  <span style={{ fontWeight: 600 }}>{formatRupiah(totalRevenue * 0.05)}</span>
-                </div>
+                {revenueAccounts.length > 0 ? (
+                  revenueAccounts.map(r => (
+                    <div key={r.account} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
+                      <span>{r.account}</span>
+                      <span style={{ fontWeight: 600 }}>{formatRupiah(r.amount)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontSize: 12.5, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    Belum ada pencatatan pendapatan di database.
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 14px', background: '#f8fafc', borderRadius: 'var(--radius-sm)', fontWeight: 700, fontSize: 13.5, color: 'var(--text-dark)', marginTop: 10 }}>
                 <span>Total pendapatan</span>
@@ -184,24 +189,24 @@ export default function ReportsView({
               </div>
             </div>
 
-            {/* Section 2: Beban Usaha */}
+            {/* Section 2: Beban Usaha & HPP */}
             <div style={{ marginBottom: 20 }}>
               <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: 'var(--radius-sm)', fontWeight: 700, fontSize: 13, color: 'var(--text-dark)', marginBottom: 8 }}>
-                Beban usaha
+                Beban usaha & HPP
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '0 14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
-                  <span>Beban perlengkapan</span>
-                  <span style={{ fontWeight: 600 }}>{formatRupiah(totalExpense * 0.38)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
-                  <span>Beban sewa & operasional</span>
-                  <span style={{ fontWeight: 600 }}>{formatRupiah(totalExpense * 0.40)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
-                  <span>Beban listrik, air, dan lainnya</span>
-                  <span style={{ fontWeight: 600 }}>{formatRupiah(totalExpense * 0.22)}</span>
-                </div>
+                {[...expenseAccounts, ...cogsAccounts].length > 0 ? (
+                  [...expenseAccounts, ...cogsAccounts].map(e => (
+                    <div key={e.account} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-body)' }}>
+                      <span>{e.account}</span>
+                      <span style={{ fontWeight: 600 }}>{formatRupiah(e.amount)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ fontSize: 12.5, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    Belum ada pencatatan beban atau HPP di database.
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 14px', background: '#f8fafc', borderRadius: 'var(--radius-sm)', fontWeight: 700, fontSize: 13.5, color: 'var(--text-dark)', marginTop: 10 }}>
                 <span>Total beban</span>
@@ -218,16 +223,16 @@ export default function ReportsView({
 
           {/* Right Column: Sorotan Bulan Ini (Matches Reference 04) */}
           <div className="moneva-card" style={{ marginBottom: 0, height: 'fit-content' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Sorotan bulan ini</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Sorotan periode ini</h3>
             <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Margin laba bersih</p>
 
             <div style={{ fontSize: 44, fontWeight: 800, color: 'var(--brand-teal)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-              {marginPercent}%
+              {netMargin}%
             </div>
 
             <div style={{ margin: '12px 0 24px' }}>
-              <span className="trend-badge trend-badge-teal" style={{ padding: '4px 10px', fontSize: 12 }}>
-                Performa positif
+              <span className={`trend-badge ${netProfit >= 0 ? 'trend-badge-teal' : 'trend-badge-rose'}`} style={{ padding: '4px 10px', fontSize: 12 }}>
+                {netProfit >= 0 ? 'Performa positif' : 'Perlu efisiensi'}
               </span>
             </div>
 
@@ -239,7 +244,7 @@ export default function ReportsView({
                   <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{formatRupiah(totalRevenue)}</span>
                 </div>
                 <div style={{ width: '100%', height: 8, background: '#f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
-                  <div style={{ width: '100%', height: '100%', background: 'var(--brand-teal)', borderRadius: 10 }} />
+                  <div style={{ width: totalRevenue > 0 ? '100%' : '0%', height: '100%', background: 'var(--brand-teal)', borderRadius: 10 }} />
                 </div>
               </div>
 
@@ -249,13 +254,13 @@ export default function ReportsView({
                   <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{formatRupiah(totalExpense)}</span>
                 </div>
                 <div style={{ width: '100%', height: 8, background: '#f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
-                  <div style={{ width: `${Math.min(100, (totalExpense / totalRevenue) * 100)}%`, height: '100%', background: 'var(--brand-orange)', borderRadius: 10 }} />
+                  <div style={{ width: `${expenseRatio}%`, height: '100%', background: 'var(--brand-orange)', borderRadius: 10 }} />
                 </div>
               </div>
             </div>
 
             <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, borderTop: '1px solid var(--border-light)', paddingTop: 16 }}>
-              Laporan laba rugi dihitung secara akrual otomatis dari seluruh transaksi jurnal debit & kredit yang telah Anda input.
+              Laporan laba rugi dihitung secara akrual otomatis dari seluruh transaksi jurnal debit & kredit yang telah Anda input ke database Neon PostgreSQL.
             </div>
           </div>
         </div>
@@ -265,7 +270,7 @@ export default function ReportsView({
       {activeReportTab === 'Neraca' && (
         <div className="moneva-card">
           <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Balance Sheet (Neraca Akumulasi)</h3>
-          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Posisi Aset, Liabilitas, dan Ekuitas per Bulan</p>
+          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Posisi Aset, Liabilitas, dan Ekuitas per Bulan dari Database</p>
 
           <div className="table-container">
             <table className="moneva-table">
@@ -355,7 +360,7 @@ export default function ReportsView({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Buku Besar (General Ledger)</h3>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Riwayat mutasi dan saldo berjalan per akun</p>
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Riwayat mutasi dan saldo berjalan per akun dari database</p>
             </div>
             {accounts.length > 0 && (
               <div style={{ width: 220 }}>
@@ -403,7 +408,7 @@ export default function ReportsView({
                 ) : (
                   <tr>
                     <td colSpan={5} style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)' }}>
-                      Belum ada mutasi transaksi untuk akun ini.
+                      Belum ada mutasi transaksi untuk akun ini di database.
                     </td>
                   </tr>
                 )}
@@ -455,7 +460,7 @@ export default function ReportsView({
                 ) : (
                   <tr>
                     <td colSpan={4} style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)' }}>
-                      Belum ada data neraca saldo.
+                      Belum ada data neraca saldo di database.
                     </td>
                   </tr>
                 )}

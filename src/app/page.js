@@ -40,7 +40,7 @@ export default function HomePage() {
   }, []);
 
   // ==========================================
-  // FETCH API HANDLERS
+  // FETCH API HANDLERS (TERINTEGRASI DB)
   // ==========================================
   const fetchAccounts = useCallback(async () => {
     try {
@@ -188,7 +188,7 @@ export default function HomePage() {
   ]);
 
   // ==========================================
-  // ACTION HANDLERS
+  // ACTION HANDLERS (DB MUTATIONS)
   // ==========================================
   const handleAddAccount = async (accountPayload) => {
     if (!accountPayload.account.trim()) {
@@ -204,7 +204,8 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        fetchAccounts();
+        await fetchAccounts();
+        await fetchDashboard();
         return true;
       } else {
         addToast(data.error || 'Gagal menambah akun', 'error');
@@ -216,6 +217,26 @@ export default function HomePage() {
     }
   };
 
+  const handleSeedStandardAccounts = async () => {
+    try {
+      const res = await fetch('/api/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'seed' })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        addToast(data.message);
+        await fetchAccounts();
+        await fetchDashboard();
+      } else {
+        addToast(data.error || 'Gagal menambahkan akun standar', 'error');
+      }
+    } catch {
+      addToast('Terjadi kesalahan koneksi server', 'error');
+    }
+  };
+
   const handleDeleteAccount = async (accountName) => {
     if (!window.confirm(`Apakah Anda yakin ingin menghapus akun '${accountName}'?`)) return;
     try {
@@ -223,7 +244,8 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        fetchAccounts();
+        await fetchAccounts();
+        await fetchDashboard();
       } else {
         addToast(data.error || 'Gagal menghapus akun', 'error');
       }
@@ -251,8 +273,9 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        fetchTransactions();
-        fetchDashboard();
+        await fetchTransactions();
+        await fetchAccounts();
+        await fetchDashboard();
         return true;
       } else {
         addToast(data.error || 'Gagal menyimpan transaksi', 'error');
@@ -271,8 +294,9 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        fetchTransactions();
-        fetchDashboard();
+        await fetchTransactions();
+        await fetchAccounts();
+        await fetchDashboard();
       } else {
         addToast(data.error || 'Gagal menghapus transaksi', 'error');
       }
@@ -289,9 +313,9 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        fetchAccounts();
-        fetchTransactions();
-        fetchDashboard();
+        await fetchAccounts();
+        await fetchTransactions();
+        await fetchDashboard();
         setActiveMenu('Dashboard');
       } else {
         addToast(data.error || 'Gagal melakukan reset', 'error');
@@ -315,15 +339,17 @@ export default function HomePage() {
       {/* Main View Area */}
       <main className="main-container">
         {loading && activeMenu === 'Dashboard' && !dashboardData ? (
-          <LoadingSpinner message="Memuat data pembukuan usaha..." />
+          <LoadingSpinner message="Menghubungkan & mengambil data pembukuan dari cloud database..." />
         ) : (
           <>
             {activeMenu === 'Dashboard' && (
               <DashboardView
                 data={dashboardData}
                 transactions={transactions}
+                accounts={accounts}
                 onOpenNewJournal={() => setActiveMenu('Input Journal')}
                 onNavigate={setActiveMenu}
+                onSeedStandardAccounts={handleSeedStandardAccounts}
               />
             )}
 
@@ -333,6 +359,7 @@ export default function HomePage() {
                 onAddAccount={handleAddAccount}
                 onDeleteAccount={handleDeleteAccount}
                 onResetDatabase={handleResetDatabase}
+                onSeedStandardAccounts={handleSeedStandardAccounts}
               />
             )}
 
