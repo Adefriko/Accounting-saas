@@ -6,13 +6,13 @@ export default function ToastContainer({ toasts }) {
   if (!toasts || toasts.length === 0) return null;
 
   return (
-    <div className="toast-container">
+    <div className="toast-container-moneva">
       {toasts.map(t => (
-        <div key={t.id} className={`toast toast-${t.type}`}>
+        <div key={t.id} className={`toast-moneva ${t.type === 'error' ? 'toast-error' : ''}`}>
           {t.type === 'success' ? (
-            <CheckCircle size={18} className="emerald-text" />
+            <CheckCircle size={18} style={{ color: 'var(--brand-teal)', flexShrink: 0 }} />
           ) : (
-            <AlertCircle size={18} className="rose-text" />
+            <AlertCircle size={18} style={{ color: 'var(--brand-rose)', flexShrink: 0 }} />
           )}
           <span>{t.message}</span>
         </div>

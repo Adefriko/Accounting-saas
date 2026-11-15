@@ -1,24 +1,20 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Sidebar from '@/frontend/components/Sidebar';
-import MobileTopbar from '@/frontend/components/MobileTopbar';
+import Navbar from '@/frontend/components/Navbar';
+import Footer from '@/frontend/components/Footer';
 import ToastContainer from '@/frontend/components/ToastContainer';
 import LoadingSpinner from '@/frontend/components/LoadingSpinner';
 
 import DashboardView from '@/frontend/views/DashboardView';
 import AccountsView from '@/frontend/views/AccountsView';
 import JournalView from '@/frontend/views/JournalView';
-import LedgerView from '@/frontend/views/LedgerView';
-import TrialBalanceView from '@/frontend/views/TrialBalanceView';
-import IncomeStatementView from '@/frontend/views/IncomeStatementView';
-import BalanceSheetView from '@/frontend/views/BalanceSheetView';
-import CashflowView from '@/frontend/views/CashflowView';
+import ReportsView from '@/frontend/views/ReportsView';
 
 export default function HomePage() {
   // Navigation & Core States
+  // activeMenu: 'Dashboard' | 'Chart of Accounts' | 'Input Journal' | 'Laporan Keuangan'
   const [activeMenu, setActiveMenu] = useState('Dashboard');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -90,63 +86,46 @@ export default function HomePage() {
 
   const fetchLedger = useCallback(async (accName) => {
     if (!accName) return;
-    setLoading(true);
     try {
       const res = await fetch(`/api/ledger?account=${encodeURIComponent(accName)}`);
       const data = await res.json();
       if (res.ok) setLedgerData(data);
-      else addToast(data.error || 'Gagal memuat buku besar', 'error');
     } catch {
       console.error('Error fetching ledger');
-    } finally {
-      setLoading(false);
     }
-  }, [addToast]);
+  }, []);
 
   const fetchTrialBalance = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch('/api/trial-balance');
       const data = await res.json();
       if (res.ok) setTrialBalanceData(data);
-      else addToast(data.error || 'Gagal memuat neraca saldo', 'error');
     } catch {
       console.error('Error fetching trial balance');
-    } finally {
-      setLoading(false);
     }
-  }, [addToast]);
+  }, []);
 
   const fetchIncomeStatement = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch('/api/income-statement');
       const data = await res.json();
       if (res.ok) setIncomeStatementData(data);
-      else addToast(data.error || 'Gagal memuat laba rugi', 'error');
     } catch {
       console.error('Error fetching income statement');
-    } finally {
-      setLoading(false);
     }
-  }, [addToast]);
+  }, []);
 
   const fetchBalanceSheet = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch('/api/balance-sheet');
       const data = await res.json();
       if (res.ok) setBalanceSheetData(data);
-      else addToast(data.error || 'Gagal memuat neraca', 'error');
     } catch {
       console.error('Error fetching balance sheet');
-    } finally {
-      setLoading(false);
     }
-  }, [addToast]);
+  }, []);
 
   const fetchCashflow = useCallback(async (accName) => {
-    setLoading(true);
     try {
       const url = accName ? `/api/cashflow?account=${encodeURIComponent(accName)}` : '/api/cashflow';
       const res = await fetch(url);
@@ -156,41 +135,43 @@ export default function HomePage() {
         if (data.selected_account && !cashflowAccount) {
           setCashflowAccount(data.selected_account);
         }
-      } else {
-        addToast(data.error || 'Gagal memuat arus kas', 'error');
       }
     } catch {
       console.error('Error fetching cashflow');
-    } finally {
-      setLoading(false);
     }
-  }, [cashflowAccount, addToast]);
+  }, [cashflowAccount]);
 
-  // Initial mount load
+  // Initial load
   useEffect(() => {
     fetchAccounts();
     fetchTransactions();
-  }, [fetchAccounts, fetchTransactions]);
+    fetchDashboard();
+  }, [fetchAccounts, fetchTransactions, fetchDashboard]);
 
   // Tab switch effect
   useEffect(() => {
-    if (activeMenu === 'Dashboard') fetchDashboard();
-    else if (activeMenu === 'Chart of Accounts') fetchAccounts();
-    else if (activeMenu === 'Input Journal') {
+    if (activeMenu === 'Dashboard') {
+      fetchDashboard();
+      fetchTransactions();
+    } else if (activeMenu === 'Chart of Accounts') {
+      fetchAccounts();
+    } else if (activeMenu === 'Input Journal') {
       fetchAccounts();
       fetchTransactions();
-    } else if (activeMenu === 'General Ledger') {
+    } else if (activeMenu === 'Laporan Keuangan') {
       fetchAccounts();
+      fetchTransactions();
+      fetchIncomeStatement();
+      fetchBalanceSheet();
+      fetchCashflow(cashflowAccount);
+      fetchTrialBalance();
       if (accounts.length > 0 && !ledgerAccount) {
         setLedgerAccount(accounts[0].account);
         fetchLedger(accounts[0].account);
       } else if (ledgerAccount) {
         fetchLedger(ledgerAccount);
       }
-    } else if (activeMenu === 'Trial Balance') fetchTrialBalance();
-    else if (activeMenu === 'Income Statement') fetchIncomeStatement();
-    else if (activeMenu === 'Balance Sheet') fetchBalanceSheet();
-    else if (activeMenu === 'Cashflow') fetchCashflow(cashflowAccount);
+    }
   }, [
     activeMenu, 
     ledgerAccount, 
@@ -271,6 +252,7 @@ export default function HomePage() {
       if (res.ok) {
         addToast(data.message);
         fetchTransactions();
+        fetchDashboard();
         return true;
       } else {
         addToast(data.error || 'Gagal menyimpan transaksi', 'error');
@@ -283,13 +265,14 @@ export default function HomePage() {
   };
 
   const handleDeleteTransaction = async (id) => {
-    if (!window.confirm('Apakah Anda yakin ingin membatalkan/menghapus transaksi ini?')) return;
+    if (!window.confirm('Apakah Anda yakin ingin membatalkan transaksi ini?')) return;
     try {
       const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
         fetchTransactions();
+        fetchDashboard();
       } else {
         addToast(data.error || 'Gagal menghapus transaksi', 'error');
       }
@@ -308,6 +291,7 @@ export default function HomePage() {
         addToast(data.message);
         fetchAccounts();
         fetchTransactions();
+        fetchDashboard();
         setActiveMenu('Dashboard');
       } else {
         addToast(data.error || 'Gagal melakukan reset', 'error');
@@ -318,41 +302,28 @@ export default function HomePage() {
   };
 
   return (
-    <div className="app-container">
-      {/* Toast Notifikasi */}
+    <div className="app-wrapper">
+      {/* Toast Alert */}
       <ToastContainer toasts={toasts} />
 
-      {/* Mobile Topbar */}
-      <MobileTopbar onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
-
-      {/* Sidebar Navigasi */}
-      <Sidebar
+      {/* Moneva Topbar Navigation */}
+      <Navbar
         activeMenu={activeMenu}
         onSelectMenu={setActiveMenu}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
       />
 
       {/* Main View Area */}
-      <main className="main-content">
-        <header className="header-section">
-          <h1 className="header-title">{activeMenu}</h1>
-          <span className="header-subtitle">
-            <span className="live-indicator" />
-            {activeMenu === 'Dashboard' 
-              ? 'Data otomatis diperbarui dari database cloud...' 
-              : 'Pembukuan akuntansi terintegrasi'}
-          </span>
-        </header>
-
-        {loading ? (
-          <LoadingSpinner />
+      <main className="main-container">
+        {loading && activeMenu === 'Dashboard' && !dashboardData ? (
+          <LoadingSpinner message="Memuat data pembukuan usaha..." />
         ) : (
           <>
             {activeMenu === 'Dashboard' && (
               <DashboardView
                 data={dashboardData}
-                onNavigateToAccounts={() => setActiveMenu('Chart of Accounts')}
+                transactions={transactions}
+                onOpenNewJournal={() => setActiveMenu('Input Journal')}
+                onNavigate={setActiveMenu}
               />
             )}
 
@@ -375,35 +346,21 @@ export default function HomePage() {
               />
             )}
 
-            {activeMenu === 'General Ledger' && (
-              <LedgerView
+            {activeMenu === 'Laporan Keuangan' && (
+              <ReportsView
+                incomeStatementData={incomeStatementData}
+                balanceSheetData={balanceSheetData}
+                cashflowData={cashflowData}
+                ledgerData={ledgerData}
+                trialBalanceData={trialBalanceData}
                 accounts={accounts}
-                selectedAccount={ledgerAccount}
-                onSelectAccount={acc => {
+                ledgerAccount={ledgerAccount}
+                onSelectLedgerAccount={acc => {
                   setLedgerAccount(acc);
                   fetchLedger(acc);
                 }}
-                data={ledgerData}
-              />
-            )}
-
-            {activeMenu === 'Trial Balance' && (
-              <TrialBalanceView data={trialBalanceData} />
-            )}
-
-            {activeMenu === 'Income Statement' && (
-              <IncomeStatementView data={incomeStatementData} />
-            )}
-
-            {activeMenu === 'Balance Sheet' && (
-              <BalanceSheetView data={balanceSheetData} />
-            )}
-
-            {activeMenu === 'Cashflow' && (
-              <CashflowView
-                data={cashflowData}
-                selectedAccount={cashflowAccount}
-                onSelectAccount={acc => {
+                cashflowAccount={cashflowAccount}
+                onSelectCashflowAccount={acc => {
                   setCashflowAccount(acc);
                   fetchCashflow(acc);
                 }}
@@ -412,6 +369,9 @@ export default function HomePage() {
           </>
         )}
       </main>
+
+      {/* Moneva Footer */}
+      <Footer />
     </div>
   );
 }
