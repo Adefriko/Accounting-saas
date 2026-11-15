@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounting SaaS - Figma UI/UX Design System & Wireframe Kit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       FIGMA DESIGN SYSTEM VARIABLES & BASE RESET
+       ========================================================================== */
+    :root {
+      /* Backgrounds & Surfaces */
+      --bg-dark-900: #0a0e1a;
+      --bg-dark-800: #0f1629;
+      --bg-dark-700: #141c33;
+      --bg-glass: rgba(15, 22, 41, 0.75);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-glass-subtle: rgba(255, 255, 255, 0.04);
+      --hover-glass: rgba(255, 255, 255, 0.03);
+
+      /* Accent Brand Colors */
+      --accent-blue: #3b82f6;
+      --accent-blue-light: #60a5fa;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b;
+      --accent-cyan: #06b6d4;
+
+      /* Typography Colors */
+      --text-white: #ffffff;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+
+      /* Radii */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+
+      /* Shadows */
+      --shadow-glass: 0 10px 40px rgba(0, 0, 0, 0.4);
+      --shadow-btn: 0 8px 24px rgba(59, 130, 246, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark-900);
+      color: var(--text-primary);
+      padding: 40px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin: 40px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 12px;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* ==========================================================================
+       1. COLOR PALETTE SWATCHES (FIGMA COLOR STYLES)
+       ========================================================================== */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .color-swatch {
+      background: var(--bg-dark-800);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .swatch-preview {
+      height: 70px;
+      width: 100%;
+    }
+
+    .swatch-info {
+      padding: 10px;
+    }
+
+    .swatch-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .swatch-hex {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: monospace;
+      margin-top: 2px;
+    }
+
+    /* ==========================================================================
+       2. TYPOGRAPHY HIERARCHY (FIGMA TEXT STYLES)
+       ========================================================================== */
+    .type-spec-card {
+      background: var(--bg-dark-800);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-glass-subtle);
+      padding-bottom: 12px;
+    }
+
+    .type-label {
+      font-size: 12px;
+      color: var(--accent-blue-light);
+      font-family: monospace;
+      min-width: 220px;
+    }
+
+    /* ==========================================================================
+       3. UI COMPONENTS LIBRARY
+       ========================================================================== */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .component-box {
+      background: var(--bg-dark-800);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .component-box-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+    }
+
+    .btn-delete {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--accent-rose);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-outline {
+      padding: 10px 18px;
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .badge-error {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--accent-rose);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+    }
+
+    /* Form Fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-input, .form-select {
+      padding: 12px 14px;
+      background: rgba(10, 14, 26, 0.7);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      width: 100%;
+      outline: none;
+    }
+
+    /* ==========================================================================
+       4. FULL ARTBOARD 1: DESKTOP DASHBOARD (1440x900 FRAME)
+       ========================================================================== */
+    .artboard-wrapper {
+      margin-bottom: 60px;
+    }
+
+    .artboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .artboard-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-blue-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .frame-badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .mockup-desktop {
+      width: 100%;
+      height: 820px;
+      background: var(--bg-dark-900);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      display: flex;
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+    }
+
+    /* Sidebar Inside Mockup */
+    .mock-sidebar {
+      width: 250px;
+      background: var(--bg-dark-800);
+      border-right: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .mock-brand {
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .mock-brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-size: 16px;
+    }
+
+    .mock-brand-text {
+      font-size: 17px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .mock-nav {
+      list-style: none;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .mock-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .mock-nav-item.active {
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .mock-user {
+      padding: 16px;
+      border-top: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mock-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-emerald), var(--accent-blue));
+    }
+
+    /* Main Area Inside Mockup */
+    .mock-main {
+      flex: 1;
+      padding: 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .mock-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .mock-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+    }
+
+    /* Metric Cards Grid */
+    .mock-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .mock-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      backdrop-filter: blur(20px);
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin: 8px 0 4px;
+    }
+
+    .card-trend {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .trend-up { color: var(--accent-emerald); }
+    .trend-down { color: var(--accent-rose); }
+    .trend-neutral { color: var(--text-secondary); }
+
+    /* Chart Simulation Blocks */
+    .mock-charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .chart-box {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .chart-box-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .chart-canvas-sim {
+      height: 180px;
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      padding-top: 20px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .bar-col {
+      flex: 1;
+      background: linear-gradient(180deg, var(--accent-blue), rgba(59, 130, 246, 0.3));
+      border-radius: 4px 4px 0 0;
+      position: relative;
+    }
+
+    .bar-month {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* Donut chart simulation */
+    .donut-sim-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 180px;
+      position: relative;
+    }
+
+    .donut-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--accent-blue) 0% 45%,
+        var(--accent-emerald) 45% 70%,
+        var(--accent-purple) 70% 88%,
+        var(--accent-rose) 88% 100%
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-inner {
+      width: 76px;
+      height: 76px;
+      background: var(--bg-dark-800);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Table Mockup */
+    .mock-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .mock-table th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .mock-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-glass-subtle);
+    }
+
+    /* ==========================================================================
+       5. FULL ARTBOARD 2: MOBILE VIEW (390x844 IPHONE FRAME)
+       ========================================================================== */
+    .mockup-mobile-frame {
+      width: 390px;
+      height: 780px;
+      background: var(--bg-dark-900);
+      border: 3px solid rgba(255, 255, 255, 0.12);
+      border-radius: 40px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-glass);
+      margin: 0 auto;
+    }
+
+    .mobile-notch {
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .notch-bar {
+      width: 120px;
+      height: 14px;
+      background: #000;
+      border-radius: 12px;
+    }
+
+    .mobile-app-bar {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-dark-800);
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .mobile-content {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mobile-metric-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    /* Instructions Box */
+    .instructions-card {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    .instructions-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-blue-light);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-list {
+      margin-left: 20px;
+      margin-top: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header Section -->
+    <header style="margin-bottom: 40px;">
+      <h1 style="font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 8px;">
+        Accounting SaaS — Figma Design System & UI/UX Kit
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 15px;">
+        Desain referensi arsitektur UI/UX lengkap dengan tema <strong>Glassmorphism Dark Mode</strong>, komponen interaktif, token desain, dan layout frame 1440px desktop & 390px mobile yang siap diimpor langsung ke <strong>Figma</strong>.
+      </p>
+    </header>
+
+    <!-- INSTRUCTIONS BANNER -->
+    <div class="instructions-card">
+      <div class="instructions-title">
+        ⚡ Cara Termudah Ekspor / Impor ke Figma (1-Klik via Plugin)
+      </div>
+      <ol class="step-list">
+        <li>Buka software atau web <strong>Figma</strong> Anda.</li>
+        <li>Buka file project Figma baru, lalu klik kanan pada kanvas ➔ <strong>Plugins</strong> ➔ cari plugin <strong>"html.to.design"</strong> (gratis di Figma Community).</li>
+        <li>Pilih opsi <strong>"Import via URL"</strong> dan masukkan link web Vercel Anda: <code style="color: #60a5fa;">https://accounting-saas-e5ln.vercel.app</code> (atau buka file HTML ini di browser lalu gunakan opsi upload HTML).</li>
+        <li>Klik <strong>"Import"</strong> ➔ Seluruh elemen akan otomatis berubah menjadi <strong>Frames, Auto-Layout, Teks asli, dan Vektor</strong> yang dapat diedit langsung di Figma!</li>
+      </ol>
+    </div>
+
+    <!-- 1. COLOR TOKENS -->
+    <div class="section-title">
+      <span>1. Color Tokens & Theme Palette (Figma Color Styles)</span>
+    </div>
+    <p class="section-subtitle">Gunakan palet warna di bawah sebagai Color Styles di Figma Anda.</p>
+
+    <div class="palette-grid">
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #0a0e1a;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Dark 900 (Bg)</div>
+          <div class="swatch-hex">#0A0E1A</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #0f1629;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Dark 800 (Surface)</div>
+          <div class="swatch-hex">#0F1629</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #141c33;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Dark 700 (Card)</div>
+          <div class="swatch-hex">#141C33</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #3b82f6;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Primary Blue</div>
+          <div class="swatch-hex">#3B82F6</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #10b981;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Success Emerald</div>
+          <div class="swatch-hex">#10B981</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #f43f5e;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Danger Rose</div>
+          <div class="swatch-hex">#F43F5E</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #8b5cf6;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Purple</div>
+          <div class="swatch-hex">#8B5CF6</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background: #f59e0b;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Warning Amber</div>
+          <div class="swatch-hex">#F59E0B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TYPOGRAPHY -->
+    <div class="section-title">
+      <span>2. Typography Hierarchy (Font: Inter)</span>
+    </div>
+    <div class="type-spec-card">
+      <div class="type-row">
+        <span class="type-label">Heading 1 / Display (28px Bold)</span>
+        <span style="font-size: 28px; font-weight: 700; color: #fff;">Financial Overview Dashboard</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Heading 2 / Screen Title (20px SemiBold)</span>
+        <span style="font-size: 20px; font-weight: 600; color: #fff;">Chart of Accounts (Daftar Akun)</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Heading 3 / Section Title (16px SemiBold)</span>
+        <span style="font-size: 16px; font-weight: 600; color: #e2e8f0;">Buat Transaksi Jurnal Umum Baru</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Body Regular (14px Regular)</span>
+        <span style="font-size: 14px; font-weight: 400; color: #94a3b8;">Pembukuan akuntansi terintegrasi dengan double-entry bookkeeping standar.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">Table Header & Badges (11px Bold Uppercase)</span>
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #60a5fa;">TANGGAL TRANSAKSI • NOMINAL • STATUS</span>
+      </div>
+    </div>
+
+    <!-- 3. COMPONENTS -->
+    <div class="section-title">
+      <span>3. Atomic UI Components Library</span>
+    </div>
+    <div class="components-grid">
+      <!-- Buttons -->
+      <div class="component-box">
+        <div class="component-box-title">Buttons & CTAs</div>
+        <div class="btn-row">
+          <button class="btn-submit">+ Tambah Transaksi</button>
+          <button class="btn-outline">Download Excel</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-delete">🗑️ Hapus Akun</button>
+          <span style="font-size: 12px; color: var(--text-muted);">(Dilengkapi modal konfirmasi)</span>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="component-box">
+        <div class="component-box-title">Status Chips & Badges</div>
+        <div class="btn-row">
+          <span class="badge badge-success">ASSET / REVENUE</span>
+          <span class="badge badge-warning">LIABILITY / EQUITY</span>
+          <span class="badge badge-error">EXPENSE / COGS</span>
+        </div>
+        <div class="btn-row" style="margin-top: 8px;">
+          <span class="badge badge-success">✅ BALANCED</span>
+          <span class="badge badge-error">❌ UNBALANCED</span>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <div class="component-box">
+        <div class="component-box-title">Form Controls</div>
+        <div class="form-group">
+          <label class="form-label">Nama Akun</label>
+          <input type="text" class="form-input" value="Kas Operasional Utama" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipe Akun</label>
+          <select class="form-select">
+            <option>Asset (Aktiva)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DESKTOP ARTBOARD (1440x900) -->
+    <div class="section-title">
+      <span>4. Full Desktop Wireframe (1440px Artboard)</span>
+    </div>
+
+    <div class="artboard-wrapper">
+      <div class="artboard-header">
+        <div class="artboard-label">
+          <span>Artboard 01: Main Financial Dashboard</span>
+          <span class="frame-badge">1440 × 900</span>
+        </div>
+      </div>
+
+      <div class="mockup-desktop">
+        <!-- Mock Sidebar -->
+        <aside class="mock-sidebar">
+          <div>
+            <div class="mock-brand">
+              <div class="mock-brand-logo">A</div>
+              <span class="mock-brand-text">Accounting SaaS</span>
+            </div>
+            <ul class="mock-nav">
+              <li class="mock-nav-item active">📊 Dashboard</li>
+              <li class="mock-nav-item">📒 Chart of Accounts</li>
+              <li class="mock-nav-item">📝 Input Journal</li>
+              <li class="mock-nav-item">📖 General Ledger</li>
+              <li class="mock-nav-item">⚖️ Trial Balance</li>
+              <li class="mock-nav-item">💰 Income Statement</li>
+              <li class="mock-nav-item">📑 Balance Sheet</li>
+              <li class="mock-nav-item">💸 Cashflow</li>
+            </ul>
+          </div>
+          <div class="mock-user">
+            <div class="mock-avatar"></div>
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: #fff;">Administrator</div>
+              <div style="font-size: 10px; color: var(--accent-emerald);">Neon PostgreSQL</div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Mock Main Content -->
+        <main class="mock-main">
+          <div class="mock-header">
+            <div>
+              <h2 class="mock-title">Dashboard</h2>
+              <div class="mock-subtitle">
+                <span class="pulse-dot"></span>
+                <span>Data otomatis disinkronisasi dari Cloud Database</span>
+              </div>
+            </div>
+            <button class="btn-submit" style="padding: 8px 16px; font-size: 12px;">+ Input Jurnal Baru</button>
+          </div>
+
+          <!-- 4 Metric Cards -->
+          <div class="mock-metrics">
+            <div class="mock-card">
+              <div class="card-label"><span>REVENUE BULAN INI</span><span>📈</span></div>
+              <div class="card-value">Rp 128.500.000</div>
+              <div class="card-trend trend-up">▲ +14.2% MoM Growth</div>
+            </div>
+            <div class="mock-card">
+              <div class="card-label"><span>NET PROFIT BERSIH</span><span>💎</span></div>
+              <div class="card-value" style="color: var(--accent-emerald);">Rp 46.200.000</div>
+              <div class="card-trend trend-up">Net Margin: 35.9%</div>
+            </div>
+            <div class="mock-card">
+              <div class="card-label"><span>TOTAL KAS MASUK</span><span>📥</span></div>
+              <div class="card-value">Rp 150.000.000</div>
+              <div class="card-trend trend-neutral">Arus Kas Masuk</div>
+            </div>
+            <div class="mock-card">
+              <div class="card-label"><span>TOTAL KAS KELUAR</span><span>📤</span></div>
+              <div class="card-value" style="color: var(--accent-rose);">Rp 82.300.000</div>
+              <div class="card-trend trend-down">Operasional & Beban</div>
+            </div>
+          </div>
+
+          <!-- Mock Charts Row -->
+          <div class="mock-charts-row">
+            <div class="chart-box">
+              <div class="chart-box-title">Tren Pendapatan Bulanan (Revenue vs COGS)</div>
+              <div class="chart-canvas-sim">
+                <div class="bar-col" style="height: 40%;"><div class="bar-month">Jan</div></div>
+                <div class="bar-col" style="height: 60%;"><div class="bar-month">Feb</div></div>
+                <div class="bar-col" style="height: 50%;"><div class="bar-month">Mar</div></div>
+                <div class="bar-col" style="height: 75%;"><div class="bar-month">Apr</div></div>
+                <div class="bar-col" style="height: 65%;"><div class="bar-month">Mei</div></div>
+                <div class="bar-col" style="height: 90%;"><div class="bar-month">Jun</div></div>
+                <div class="bar-col" style="height: 85%;"><div class="bar-month">Jul</div></div>
+                <div class="bar-col" style="height: 100%;"><div class="bar-month">Agu</div></div>
+              </div>
+            </div>
+
+            <div class="chart-box">
+              <div class="chart-box-title">Alokasi Beban Operasional</div>
+              <div class="donut-sim-container">
+                <div class="donut-circle">
+                  <div class="donut-inner">BEBAN</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mock Table: Transaksi Terakhir -->
+          <div class="chart-box" style="padding: 16px;">
+            <div class="chart-box-title" style="margin-bottom: 12px;">Transaksi Jurnal Terkini</div>
+            <table class="mock-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Akun Debit</th>
+                  <th>Akun Credit</th>
+                  <th style="text-align: right;">Nominal</th>
+                  <th>Keterangan</th>
+                  <th style="text-align: center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2026-11-10</td>
+                  <td style="color: var(--accent-emerald); font-weight: 600;">Kas Utama</td>
+                  <td style="color: var(--accent-rose); font-weight: 600;">Pendapatan Penjualan</td>
+                  <td style="text-align: right; font-weight: 600; color: #fff;">Rp 15.000.000</td>
+                  <td>Penjualan SaaS Paket Enterprise</td>
+                  <td style="text-align: center;"><button class="btn-delete">Hapus</button></td>
+                </tr>
+                <tr>
+                  <td>2026-11-09</td>
+                  <td style="color: var(--accent-emerald); font-weight: 600;">Beban Sewa Cloud</td>
+                  <td style="color: var(--accent-rose); font-weight: 600;">Bank BCA</td>
+                  <td style="text-align: right; font-weight: 600; color: #fff;">Rp 3.500.000</td>
+                  <td>Langganan Server Cloud Database</td>
+                  <td style="text-align: center;"><button class="btn-delete">Hapus</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- 5. MOBILE ARTBOARD (390x844) -->
+    <div class="section-title">
+      <span>5. Mobile App Wireframe (390px iPhone Artboard)</span>
+    </div>
+    <div class="artboard-wrapper">
+      <div class="mockup-mobile-frame">
+        <div class="mobile-notch">
+          <div class="notch-bar"></div>
+        </div>
+        <div class="mobile-app-bar">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="mock-brand-logo" style="width: 28px; height: 28px; font-size: 13px;">A</div>
+            <span style="font-weight: 700; font-size: 15px; color: #fff;">Accounting SaaS</span>
+          </div>
+          <button style="background: transparent; border: 1px solid var(--border-glass); border-radius: 6px; color: #fff; padding: 4px 8px; font-size: 14px;">☰</button>
+        </div>
+
+        <div class="mobile-content">
+          <div>
+            <div style="font-size: 18px; font-weight: 700; color: #fff;">Dashboard</div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Pembukuan akuntansi terintegrasi</div>
+          </div>
+
+          <div class="mobile-metric-card">
+            <div class="card-label">REVENUE TERAKHIR</div>
+            <div class="card-value" style="font-size: 20px;">Rp 128.500.000</div>
+            <div class="card-trend trend-up">▲ +14.2% MoM Growth</div>
+          </div>
+
+          <div class="mobile-metric-card">
+            <div class="card-label">NET PROFIT BERSIH</div>
+            <div class="card-value" style="font-size: 20px; color: var(--accent-emerald);">Rp 46.200.000</div>
+            <div class="card-trend trend-up">Net Margin: 35.9%</div>
+          </div>
+
+          <div class="mobile-metric-card">
+            <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 8px;">Ringkasan Kas Masuk & Keluar</div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span style="color: var(--text-secondary);">Kas Masuk:</span>
+              <span style="font-weight: 600; color: var(--accent-emerald);">Rp 150.000.000</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+              <span style="color: var(--text-secondary);">Kas Keluar:</span>
+              <span style="font-weight: 600; color: var(--accent-rose);">Rp 82.300.000</span>
+            </div>
+          </div>
+
+          <button class="btn-submit" style="width: 100%; justify-content: center;">+ Buat Transaksi Jurnal</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
