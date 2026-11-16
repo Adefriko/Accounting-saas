@@ -5,6 +5,7 @@ import Navbar from '@/frontend/components/Navbar';
 import Footer from '@/frontend/components/Footer';
 import ToastContainer from '@/frontend/components/ToastContainer';
 import LoadingSpinner from '@/frontend/components/LoadingSpinner';
+import AuthScreen from '@/frontend/components/AuthScreen';
 
 import DashboardView from '@/frontend/views/DashboardView';
 import AccountsView from '@/frontend/views/AccountsView';
@@ -12,8 +13,11 @@ import JournalView from '@/frontend/views/JournalView';
 import ReportsView from '@/frontend/views/ReportsView';
 
 export default function HomePage() {
+  // Auth & Session States
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authChecking, setAuthChecking] = useState(true);
+
   // Navigation & Core States
-  // activeMenu: 'Dashboard' | 'Chart of Accounts' | 'Input Journal' | 'Laporan Keuangan'
   const [activeMenu, setActiveMenu] = useState('Dashboard');
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -39,6 +43,40 @@ export default function HomePage() {
     }, 4000);
   }, []);
 
+  // Check stored user session on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('moneva_user_session');
+      if (stored) {
+        setCurrentUser(JSON.parse(stored));
+      }
+    } catch {
+      console.warn('Session parsing error');
+    } finally {
+      setAuthChecking(false);
+    }
+  }, []);
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    try {
+      localStorage.setItem('moneva_user_session', JSON.stringify(user));
+    } catch (e) {
+      console.error(e);
+    }
+    addToast(`Selamat datang, ${user.name}!`);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('moneva_user_session');
+    } catch (e) {
+      console.error(e);
+    }
+    addToast('Anda telah keluar dari Moneva.', 'info');
+  };
+
   // ==========================================
   // FETCH API HANDLERS (TERINTEGRASI DB)
   // ==========================================
@@ -46,11 +84,8 @@ export default function HomePage() {
     try {
       const res = await fetch('/api/accounts');
       const data = await res.json();
-      if (res.ok) {
-        setAccounts(Array.isArray(data) ? data : []);
-      } else {
-        addToast(data.error || 'Gagal memuat akun', 'error');
-      }
+      if (res.ok) setAccounts(Array.isArray(data) ? data : []);
+      else addToast(data.error || 'Gagal memuat akun', 'error');
     } catch {
       addToast('Terjadi kesalahan koneksi server', 'error');
     }
@@ -60,11 +95,8 @@ export default function HomePage() {
     try {
       const res = await fetch('/api/transactions');
       const data = await res.json();
-      if (res.ok) {
-        setTransactions(Array.isArray(data) ? data : []);
-      } else {
-        addToast(data.error || 'Gagal memuat transaksi', 'error');
-      }
+      if (res.ok) setTransactions(Array.isArray(data) ? data : []);
+      else addToast(data.error || 'Gagal memuat transaksi', 'error');
     } catch {
       console.error('Error fetching transactions');
     }
@@ -141,15 +173,18 @@ export default function HomePage() {
     }
   }, [cashflowAccount]);
 
-  // Initial load
+  // Initial load when logged in
   useEffect(() => {
-    fetchAccounts();
-    fetchTransactions();
-    fetchDashboard();
-  }, [fetchAccounts, fetchTransactions, fetchDashboard]);
+    if (currentUser) {
+      fetchAccounts();
+      fetchTransactions();
+      fetchDashboard();
+    }
+  }, [currentUser, fetchAccounts, fetchTransactions, fetchDashboard]);
 
   // Tab switch effect
   useEffect(() => {
+    if (!currentUser) return;
     if (activeMenu === 'Dashboard') {
       fetchDashboard();
       fetchTransactions();
@@ -173,6 +208,7 @@ export default function HomePage() {
       }
     }
   }, [
+    currentUser,
     activeMenu, 
     ledgerAccount, 
     cashflowAccount,
@@ -207,10 +243,9 @@ export default function HomePage() {
         await fetchAccounts();
         await fetchDashboard();
         return true;
-      } else {
-        addToast(data.error || 'Gagal menambah akun', 'error');
-        return false;
       }
+      addToast(data.error || 'Gagal menambah akun', 'error');
+      return false;
     } catch {
       addToast('Terjadi kesalahan koneksi server', 'error');
       return false;
@@ -277,10 +312,9 @@ export default function HomePage() {
         await fetchAccounts();
         await fetchDashboard();
         return true;
-      } else {
-        addToast(data.error || 'Gagal menyimpan transaksi', 'error');
-        return false;
       }
+      addToast(data.error || 'Gagal menyimpan transaksi', 'error');
+      return false;
     } catch {
       addToast('Terjadi kesalahan koneksi server', 'error');
       return false;
@@ -306,7 +340,7 @@ export default function HomePage() {
   };
 
   const handleResetDatabase = async () => {
-    if (!window.confirm('🔴 PERINGATAN: Apakah Anda yakin ingin menghapus SELURUH daftar akun dan riwayat transaksi secara permanen?')) return;
+    if (!window.confirm('🔴 PERINGATAN: Apakah Anda yakin ingin mereset seluruh database?')) return;
     if (!window.confirm('Tindakan ini 100% TIDAK DAPAT DIBATALKAN. Lanjutkan?')) return;
     try {
       const res = await fetch('/api/reset', { method: 'POST' });
@@ -325,6 +359,26 @@ export default function HomePage() {
     }
   };
 
+  // Loading Session Spinner
+  if (authChecking) {
+    return (
+      <div className="app-wrapper flex-center" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingSpinner message="Menyiapkan sesi aplikasi Moneva..." />
+      </div>
+    );
+  }
+
+  // Not Logged In -> Show Auth Screen
+  if (!currentUser) {
+    return (
+      <div className="app-wrapper">
+        <ToastContainer toasts={toasts} />
+        <AuthScreen onLoginSuccess={handleLoginSuccess} />
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="app-wrapper">
       {/* Toast Alert */}
@@ -334,6 +388,8 @@ export default function HomePage() {
       <Navbar
         activeMenu={activeMenu}
         onSelectMenu={setActiveMenu}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* Main View Area */}

@@ -5,10 +5,12 @@ import {
   BookOpen, 
   FileSpreadsheet, 
   TrendingUp, 
-  Bell
+  Bell,
+  LogOut,
+  User
 } from 'lucide-react';
 
-export default function Navbar({ activeMenu, onSelectMenu }) {
+export default function Navbar({ activeMenu, onSelectMenu, currentUser, onLogout }) {
   const navItems = [
     { id: 'Dashboard', label: 'Beranda', icon: LayoutDashboard },
     { id: 'Chart of Accounts', label: 'Daftar Akun', icon: BookOpen },
@@ -16,13 +18,22 @@ export default function Navbar({ activeMenu, onSelectMenu }) {
     { id: 'Laporan Keuangan', label: 'Laporan', icon: TrendingUp },
   ];
 
+  // Ambil inisial nama
+  const initials = currentUser?.name
+    ? currentUser.name
+        .split(' ')
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'U';
+
   return (
     <header className="topbar">
       <div className="topbar-content">
         {/* Brand Logo */}
         <div className="brand-wrapper" onClick={() => onSelectMenu('Dashboard')}>
           <div className="brand-icon-moneva">
-            {/* Asterisk / Sparkle Icon */}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
             </svg>
@@ -53,19 +64,43 @@ export default function Navbar({ activeMenu, onSelectMenu }) {
 
         {/* Right Section: Workspace & User Profile */}
         <div className="topbar-right">
-          <span className="prototype-tag">PROTOTYPE · LIVE DATA</span>
-
           <button className="icon-btn" title="Notifikasi">
             <Bell size={16} />
           </button>
 
-          <div className="workspace-badge">
-            <div className="workspace-avatar">TA</div>
+          {/* User Badge */}
+          <div className="workspace-badge" title={currentUser?.email || 'User'}>
+            <div className="workspace-avatar">
+              {currentUser?.avatar ? (
+                <img 
+                  src={currentUser.avatar} 
+                  alt={currentUser.name} 
+                  style={{ width: '100%', height: '100%', borderRadius: '50%' }} 
+                />
+              ) : (
+                initials
+              )}
+            </div>
             <div className="workspace-info">
-              <span className="workspace-label">Workspace</span>
-              <span className="workspace-name">Taman Aster Shoes</span>
+              <span className="workspace-label">
+                {currentUser?.provider === 'google' ? 'Google Account' : 'Akun Bisnis'}
+              </span>
+              <span className="workspace-name">
+                {currentUser?.name || 'Taman Aster Shoes'}
+              </span>
             </div>
           </div>
+
+          {/* Logout Button */}
+          {onLogout && (
+            <button 
+              className="icon-btn btn-logout" 
+              onClick={onLogout}
+              title="Keluar / Logout"
+            >
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
       </div>
     </header>
