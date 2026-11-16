@@ -30,8 +30,8 @@ export default function AuthScreen({ onLoginSuccess }) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Gagal mendaftar');
 
-        // Otomatis login setelah registrasi
-        onLoginSuccess(data.data.user);
+        const loggedUser = data.user || data.data?.user || data;
+        onLoginSuccess(loggedUser);
       } else {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
@@ -41,7 +41,8 @@ export default function AuthScreen({ onLoginSuccess }) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Email atau kata sandi salah');
 
-        onLoginSuccess(data.data.user);
+        const loggedUser = data.user || data.data?.user || data;
+        onLoginSuccess(loggedUser);
       }
     } catch (err) {
       setErrorMsg(err.message);
@@ -72,7 +73,8 @@ export default function AuthScreen({ onLoginSuccess }) {
       if (!res.ok) throw new Error(data.error || 'Gagal masuk dengan Google');
 
       setGoogleModal(false);
-      onLoginSuccess(data.data.user);
+      const loggedUser = data.user || data.data?.user || data;
+      onLoginSuccess(loggedUser);
     } catch (err) {
       setErrorMsg(err.message);
     } finally {

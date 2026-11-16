@@ -71,6 +71,9 @@ export default function HomePage() {
     setCurrentUser(user);
     try {
       localStorage.setItem('moneva_user_session', JSON.stringify(user));
+      if (typeof document !== 'undefined') {
+        document.cookie = `moneva_session=${encodeURIComponent(user.token || user.id)}; path=/; max-age=604800; SameSite=Lax`;
+      }
     } catch (e) {
       console.error(e);
     }
@@ -82,6 +85,9 @@ export default function HomePage() {
     setIsAccountModalOpen(false);
     try {
       localStorage.removeItem('moneva_user_session');
+      if (typeof document !== 'undefined') {
+        document.cookie = 'moneva_session=; path=/; max-age=0;';
+      }
     } catch (e) {
       console.error(e);
     }

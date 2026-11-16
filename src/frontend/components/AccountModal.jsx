@@ -48,10 +48,11 @@ export default function AccountModal({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Gagal memperbarui keterangan akun');
 
-      if (data.data?.user) {
+      const updatedUser = data.user || data.data?.user;
+      if (updatedUser) {
         onUpdateUser({
           ...user,
-          ...data.data.user
+          ...updatedUser
         });
       }
       setSuccessMsg('Keterangan akun dan alamat berhasil disimpan!');
