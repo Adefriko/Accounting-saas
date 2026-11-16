@@ -421,12 +421,12 @@ export default function HomePage() {
         />
       )}
 
-      {/* Main View Area */}
+      {/* Main View Area with Slide Animation */}
       <main className="main-container">
         {loading && activeMenu === 'Dashboard' && !dashboardData ? (
           <LoadingSpinner message="Menghubungkan & mengambil data pembukuan dari cloud database..." />
         ) : (
-          <>
+          <div key={activeMenu} className="feature-slide-enter">
             {activeMenu === 'Dashboard' && (
               <DashboardView
                 data={dashboardData}
@@ -478,7 +478,7 @@ export default function HomePage() {
                 }}
               />
             )}
-          </>
+          </div>
         )}
       </main>
 

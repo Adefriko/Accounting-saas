@@ -5,9 +5,8 @@ import {
   BookOpen, 
   FileSpreadsheet, 
   TrendingUp, 
-  Bell,
-  LogOut,
-  User
+  LogOut, 
+  UserCircle2
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -67,24 +66,13 @@ export default function Navbar({
           })}
         </nav>
 
-        {/* Right Section: Workspace & User Profile */}
+        {/* Right Section: 1 Single Unified User Profile */}
         <div className="topbar-right">
-          {/* Akun Saya Button */}
-          <button
-            className="btn-moneva-outline btn-account-pill"
-            onClick={onOpenAccount}
-            title="Buka Keterangan Akun Saya & Alamat"
-          >
-            <User size={14} />
-            <span>Akun Saya</span>
-          </button>
-
-          {/* User Badge */}
+          {/* Single Account Badge (Opens "Keterangan Akun Saya") */}
           <div 
-            className="workspace-badge" 
+            className="workspace-badge single-account-badge" 
             onClick={onOpenAccount}
-            style={{ cursor: 'pointer' }}
-            title="Klik untuk membuka Keterangan Akun Saya"
+            title="Klik untuk membuka Keterangan Akun Saya & Alamat Bisnis"
           >
             <div className="workspace-avatar">
               {currentUser?.avatar ? (
@@ -104,6 +92,9 @@ export default function Navbar({
               <span className="workspace-name">
                 {currentUser?.name || 'Taman Aster Shoes'}
               </span>
+            </div>
+            <div className="badge-user-icon">
+              <UserCircle2 size={16} className="text-secondary" />
             </div>
           </div>
 

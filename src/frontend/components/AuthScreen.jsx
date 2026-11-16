@@ -155,8 +155,8 @@ export default function AuthScreen({ onLoginSuccess }) {
           </div>
         </div>
 
-        {/* Form Fields */}
-        <form onSubmit={handleSubmit} className="auth-form">
+        {/* Form Fields with Slide Transition */}
+        <form key={mode} onSubmit={handleSubmit} className="auth-form tab-slide-enter">
           {mode === 'register' && (
             <div className="auth-field">
               <label>Nama Lengkap / Nama Bisnis</label>

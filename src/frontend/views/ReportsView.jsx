@@ -151,8 +151,10 @@ export default function ReportsView({
         })}
       </div>
 
-      {/* TAB 1: LABA RUGI (Matches Reference 04-Laporan-Keuangan-Desktop.png) */}
-      {activeReportTab === 'Laba Rugi' && (
+      {/* Sub-Tabs Content with Slide Animation */}
+      <div key={activeReportTab} className="tab-slide-enter">
+        {/* TAB 1: LABA RUGI (Matches Reference 04-Laporan-Keuangan-Desktop.png) */}
+        {activeReportTab === 'Laba Rugi' && (
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr', gap: 24 }}>
           {/* Left Column: Laporan Laba Rugi Breakdown Real DB Data */}
           <div className="moneva-card" style={{ marginBottom: 0 }}>
@@ -482,6 +484,7 @@ export default function ReportsView({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

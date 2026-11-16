@@ -70,7 +70,9 @@ body {
 .nav-pill-btn.active { background: var(--bg-teal-subtle); color: var(--brand-teal); font-weight: 600; }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
 .prototype-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #b45309; background: #fef3c7; padding: 4px 10px; border-radius: var(--radius-pill); }
-.btn-account-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; font-size: 12.5px; border-radius: var(--radius-pill); cursor: pointer; }
+.single-account-badge { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 5px; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-pill); transition: all 0.15s ease; cursor: pointer; user-select: none; }
+.single-account-badge:hover { border-color: var(--brand-teal); background: var(--bg-teal-subtle); box-shadow: 0 2px 8px rgba(0, 109, 91, 0.08); }
+.badge-user-icon { display: flex; align-items: center; margin-left: 2px; }
 .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-light); background: var(--bg-surface); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
 .icon-btn:hover { background: var(--bg-muted); color: var(--text-dark); }
 .btn-logout:hover { background: #ffe4e6; color: var(--brand-rose); border-color: #fda4af; }
@@ -80,6 +82,29 @@ body {
 .workspace-info { display: flex; flex-direction: column; text-align: left; }
 .workspace-label { font-size: 10px; color: var(--text-muted); line-height: 1; }
 .workspace-name { font-size: 12px; font-weight: 600; color: var(--text-dark); line-height: 1.3; }
+
+/* Feature & Tab Slide Transitions */
+@keyframes slideFeatureIn {
+  0% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideTabIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.feature-slide-enter {
+  animation: slideFeatureIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  width: 100%;
+}
+
+.tab-slide-enter {
+  animation: slideTabIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  width: 100%;
+}
 
 /* Page Headers */
 .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
