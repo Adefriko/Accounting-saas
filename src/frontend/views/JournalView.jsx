@@ -45,9 +45,26 @@ export default function JournalView({
     }).sort((a, b) => b.id - a.id);
   }, [transactions, searchTerm]);
 
+  const handleOpenModal = () => {
+    setNewTx(prev => ({
+      ...prev,
+      date: new Date().toISOString().split('T')[0],
+      debit: prev.debit || accounts[0]?.account || '',
+      credit: prev.credit || accounts[1]?.account || accounts[0]?.account || ''
+    }));
+    setIsModalOpen(true);
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const success = await onAddTransaction(newTx);
+    const targetDebit = newTx.debit || accounts[0]?.account || '';
+    const targetCredit = newTx.credit || (accounts[1]?.account || accounts[0]?.account || '');
+    
+    const success = await onAddTransaction({
+      ...newTx,
+      debit: targetDebit,
+      credit: targetCredit
+    });
     if (success) {
       setNewTx({
         date: new Date().toISOString().split('T')[0],
@@ -97,7 +114,7 @@ export default function JournalView({
             <span>Ekspor CSV</span>
           </button>
 
-          <button onClick={() => setIsModalOpen(true)} className="btn-moneva-primary">
+          <button onClick={handleOpenModal} className="btn-moneva-primary">
             <Plus size={16} />
             <span>Buat Jurnal Baru</span>
           </button>

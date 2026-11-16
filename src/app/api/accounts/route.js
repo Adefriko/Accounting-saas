@@ -2,6 +2,9 @@ import { initializeDatabase } from '@/db/schema';
 import { getAllAccounts, createAccount, seedStandardAccounts } from '@/backend/services/accounts.service';
 import { successResponse, errorResponse } from '@/backend/utils/response';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/accounts
 export async function GET() {
   try {

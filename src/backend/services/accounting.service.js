@@ -1,10 +1,13 @@
 /**
- * Map nama akun ke tipe akunnya
+ * Map nama akun ke tipe akunnya (case-insensitive & trimmed)
  */
 export function buildAccountTypeMap(accounts) {
   const map = {};
   for (const acc of accounts) {
-    map[acc.account] = acc.type;
+    if (acc?.account) {
+      map[acc.account.trim()] = acc.type;
+      map[acc.account.trim().toLowerCase()] = acc.type;
+    }
   }
   return map;
 }
@@ -14,6 +17,11 @@ export function buildAccountTypeMap(accounts) {
  */
 export function calculateDashboardData(transactions, accounts) {
   const accTypes = buildAccountTypeMap(accounts);
+  const getType = (name) => {
+    if (!name) return '';
+    const clean = String(name).trim();
+    return accTypes[clean] || accTypes[clean.toLowerCase()] || '';
+  };
 
   // 1. Hitung total kas tersedia saat ini (Total saldo semua akun Aset)
   let cashAvailable = 0;
@@ -21,9 +29,10 @@ export function calculateDashboardData(transactions, accounts) {
     if (acc.type === 'Asset') {
       let debit = 0;
       let credit = 0;
+      const targetAcc = acc.account.trim().toLowerCase();
       for (const tx of transactions) {
-        if (tx.debit === acc.account) debit += tx.amount;
-        if (tx.credit === acc.account) credit += tx.amount;
+        if (String(tx.debit).trim().toLowerCase() === targetAcc) debit += (tx.amount || 0);
+        if (String(tx.credit).trim().toLowerCase() === targetAcc) credit += (tx.amount || 0);
       }
       cashAvailable += (debit - credit);
     }
@@ -32,12 +41,17 @@ export function calculateDashboardData(transactions, accounts) {
   // 2. Kelompokkan transaksi bulanan
   const monthlyData = {};
   const MONTHS_LABEL = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const currentYear = new Date().getFullYear();
 
   for (const tx of transactions) {
-    const d = new Date(tx.date);
-    const mIdx = d.getMonth();
-    const y = d.getFullYear();
-    const sortKey = tx.date.substring(0, 7); // YYYY-MM
+    if (!tx.date) continue;
+    const dateStr = String(tx.date).split('T')[0];
+    const parts = dateStr.split('-');
+    const y = parseInt(parts[0], 10) || currentYear;
+    const mIdx = (parseInt(parts[1], 10) || 1) - 1;
+    if (mIdx < 0 || mIdx > 11) continue;
+
+    const sortKey = `${y}-${String(mIdx + 1).padStart(2, '0')}`;
     const mStr = `${MONTHS_LABEL[mIdx]} ${y}`;
 
     if (!monthlyData[sortKey]) {
@@ -46,93 +60,86 @@ export function calculateDashboardData(transactions, accounts) {
         Month: mStr,
         sortKey,
         Revenue: 0,
-        COGS: 0,
         Expense: 0,
-        CashIn: 0,
-        CashOut: 0,
+        COGS: 0,
         pemasukan: 0,
         pengeluaran: 0
       };
     }
 
-    const amt = tx.amount;
-    if (accTypes[tx.credit] === 'Revenue') {
+    const amt = Number(tx.amount) || 0;
+    const debitType = getType(tx.debit);
+    const creditType = getType(tx.credit);
+
+    // Pencatatan Pendapatan / Uang Masuk Usaha
+    if (creditType === 'Revenue') {
       monthlyData[sortKey].Revenue += amt;
       monthlyData[sortKey].pemasukan += amt;
+    } else if (debitType === 'Asset' && creditType !== 'Asset') {
+      monthlyData[sortKey].pemasukan += amt;
     }
-    if (accTypes[tx.debit] === 'COGS') {
-      monthlyData[sortKey].COGS += amt;
-      monthlyData[sortKey].pengeluaran += amt;
-    }
-    if (accTypes[tx.debit] === 'Expense') {
+
+    // Pencatatan Beban / Pengeluaran Usaha
+    if (debitType === 'Expense' || debitType === 'COGS') {
       monthlyData[sortKey].Expense += amt;
       monthlyData[sortKey].pengeluaran += amt;
-    }
-    if (accTypes[tx.debit] === 'Asset') {
-      monthlyData[sortKey].CashIn += amt;
-    }
-    if (accTypes[tx.credit] === 'Asset') {
-      monthlyData[sortKey].CashOut += amt;
+    } else if (creditType === 'Asset' && debitType !== 'Asset') {
+      monthlyData[sortKey].pengeluaran += amt;
     }
   }
 
-  const sortedMonths = Object.values(monthlyData).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-
-  // Hitung profit, margin, and growth
-  for (let i = 0; i < sortedMonths.length; i++) {
-    const m = sortedMonths[i];
-    m.GrossProfit = m.Revenue - m.COGS;
-    m.NetProfit = m.GrossProfit - m.Expense;
-    m.Growth = i === 0 ? 0 : (sortedMonths[i - 1].Revenue > 0
-      ? ((m.Revenue - sortedMonths[i - 1].Revenue) / sortedMonths[i - 1].Revenue * 100) : 0);
-    m.GrossMargin = m.Revenue > 0 ? (m.GrossProfit / m.Revenue * 100) : 0;
-    m.NetMargin = m.Revenue > 0 ? (m.NetProfit / m.Revenue * 100) : 0;
+  // 3. Bangun 12 bulan penuh tahun berjalan agar grafik Recharts selalu memiliki garis kurva terhubung
+  const fullChartTimeline = [];
+  for (let m = 0; m < 12; m++) {
+    const sortKey = `${currentYear}-${String(m + 1).padStart(2, '0')}`;
+    const found = monthlyData[sortKey];
+    fullChartTimeline.push({
+      name: MONTHS_LABEL[m],
+      Month: `${MONTHS_LABEL[m]} ${currentYear}`,
+      sortKey,
+      pemasukan: found ? found.pemasukan : 0,
+      pengeluaran: found ? found.pengeluaran : 0,
+      Revenue: found ? found.Revenue : 0,
+      Expense: found ? found.Expense : 0
+    });
   }
 
-  // Ambil data bulan terkini atau total akumulasi
-  const latestMonth = sortedMonths.length > 0 ? sortedMonths[sortedMonths.length - 1] : null;
-  const prevMonth = sortedMonths.length > 1 ? sortedMonths[sortedMonths.length - 2] : null;
-
-  // Total keseluruhan
+  // Total keseluruhan All Time
   let totalRevenueAllTime = 0;
   let totalExpenseAllTime = 0;
   for (const tx of transactions) {
-    if (accTypes[tx.credit] === 'Revenue') totalRevenueAllTime += tx.amount;
-    if (accTypes[tx.debit] === 'Expense' || accTypes[tx.debit] === 'COGS') totalExpenseAllTime += tx.amount;
+    const amt = Number(tx.amount) || 0;
+    const creditType = getType(tx.credit);
+    const debitType = getType(tx.debit);
+    if (creditType === 'Revenue') totalRevenueAllTime += amt;
+    else if (debitType === 'Asset' && creditType !== 'Asset') totalRevenueAllTime += amt;
+
+    if (debitType === 'Expense' || debitType === 'COGS') totalExpenseAllTime += amt;
+    else if (creditType === 'Asset' && debitType !== 'Asset') totalExpenseAllTime += amt;
   }
   const netProfitAllTime = totalRevenueAllTime - totalExpenseAllTime;
-
-  // Pertumbuhan Revenue MoM
-  const revenueMoM = (latestMonth && prevMonth && prevMonth.Revenue > 0)
-    ? (((latestMonth.Revenue - prevMonth.Revenue) / prevMonth.Revenue) * 100)
-    : 0;
-
-  // Pertumbuhan Pengeluaran MoM
-  const expenseMoM = (latestMonth && prevMonth && prevMonth.Expense > 0)
-    ? (((latestMonth.Expense - prevMonth.Expense) / prevMonth.Expense) * 100)
-    : 0;
 
   // Laba bersih MoM
   const profitMargin = totalRevenueAllTime > 0
     ? ((netProfitAllTime / totalRevenueAllTime) * 100)
     : 0;
 
-  // Target kas operasional
+  // Target kas operasional (Rp 50 Juta)
   const targetCash = 50000000;
   const targetCashPercent = targetCash > 0 ? Math.min(100, Math.max(0, (cashAvailable / targetCash) * 100)) : 0;
 
   // Alokasi beban (Expense Breakdown per akun)
   const expenseDetails = {};
   for (const tx of transactions) {
-    if (accTypes[tx.debit] === 'Expense') {
-      expenseDetails[tx.debit] = (expenseDetails[tx.debit] || 0) + tx.amount;
+    if (['Expense', 'COGS'].includes(getType(tx.debit))) {
+      expenseDetails[tx.debit] = (expenseDetails[tx.debit] || 0) + (Number(tx.amount) || 0);
     }
   }
   const expenseBreakdown = Object.entries(expenseDetails).map(([account, amount]) => ({ account, amount }));
 
   // Transaksi terbaru terurut tanggal & id descending
   const recentTransactions = [...transactions]
-    .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)
+    .sort((a, b) => String(b.date).localeCompare(String(a.date)) || (b.id - a.id))
     .slice(0, 5);
 
   return {
@@ -141,13 +148,13 @@ export function calculateDashboardData(transactions, accounts) {
     total_expense: totalExpenseAllTime,
     net_profit: netProfitAllTime,
     cash_available: cashAvailable,
-    revenue_growth_mom: revenueMoM,
-    expense_growth_mom: expenseMoM,
+    revenue_growth_mom: 0,
+    expense_growth_mom: 0,
     profit_margin: profitMargin,
     target_cash: targetCash,
     target_cash_percent: targetCashPercent,
-    monthly_data: sortedMonths,
-    chart_data: sortedMonths,
+    monthly_data: fullChartTimeline,
+    chart_data: fullChartTimeline,
     expense_breakdown: expenseBreakdown,
     recent_transactions: recentTransactions
   };

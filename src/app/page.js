@@ -99,7 +99,10 @@ export default function HomePage() {
   // ==========================================
   const fetchAccounts = useCallback(async () => {
     try {
-      const res = await fetch('/api/accounts', { headers: getAuthHeaders() });
+      const res = await fetch(`/api/accounts?t=${Date.now()}`, { 
+        headers: getAuthHeaders(),
+        cache: 'no-store'
+      });
       if (res.status === 401) { handleLogout(); return; }
       const data = await res.json();
       if (res.ok) setAccounts(Array.isArray(data) ? data : []);
@@ -111,7 +114,10 @@ export default function HomePage() {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      const res = await fetch('/api/transactions', { headers: getAuthHeaders() });
+      const res = await fetch(`/api/transactions?t=${Date.now()}`, { 
+        headers: getAuthHeaders(),
+        cache: 'no-store'
+      });
       if (res.status === 401) { handleLogout(); return; }
       const data = await res.json();
       if (res.ok) setTransactions(Array.isArray(data) ? data : []);
@@ -124,7 +130,10 @@ export default function HomePage() {
   const fetchDashboard = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/dashboard', { headers: getAuthHeaders() });
+      const res = await fetch(`/api/dashboard?t=${Date.now()}`, { 
+        headers: getAuthHeaders(),
+        cache: 'no-store'
+      });
       if (res.status === 401) { handleLogout(); return; }
       const data = await res.json();
       if (res.ok) setDashboardData(data);

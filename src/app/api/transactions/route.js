@@ -2,6 +2,9 @@ import { initializeDatabase } from '@/db/schema';
 import { getAllTransactions, createTransaction } from '@/backend/services/transactions.service';
 import { successResponse, errorResponse } from '@/backend/utils/response';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/transactions
 export async function GET() {
   try {

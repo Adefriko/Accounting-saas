@@ -55,6 +55,7 @@ export default function DashboardView({
     : transactions.slice(0, 4);
 
   const isCashHealthy = cashAvailable >= 0;
+  const currentMonthYear = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
   return (
     <div>
@@ -69,7 +70,7 @@ export default function DashboardView({
         <div className="page-actions">
           <div className="btn-moneva-outline" style={{ cursor: 'default' }}>
             <Calendar size={15} style={{ color: 'var(--text-secondary)' }} />
-            <span>November 2026</span>
+            <span style={{ textTransform: 'capitalize' }}>{currentMonthYear}</span>
           </div>
 
           <button onClick={onOpenNewJournal} className="btn-moneva-primary">
@@ -310,7 +311,7 @@ export default function DashboardView({
                         {tx.description || `${tx.debit} ➔ ${tx.credit}`}
                       </div>
                       <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                        [D] {tx.debit} · {tx.date}
+                        {tx.date} · [D] {tx.debit} ➔ [K] {tx.credit}
                       </div>
                     </div>
                   </div>
