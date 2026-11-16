@@ -6,7 +6,7 @@ import { getDb } from '../index';
 export async function queryUserByEmail(email) {
   const sql = getDb();
   const rows = await sql`
-    SELECT id, email, name, password, avatar, provider, created_at 
+    SELECT id, email, name, password, avatar, address, provider, created_at 
     FROM users 
     WHERE LOWER(email) = LOWER(${email.trim()}) 
     LIMIT 1
@@ -20,7 +20,7 @@ export async function queryUserByEmail(email) {
 export async function queryUserById(id) {
   const sql = getDb();
   const rows = await sql`
-    SELECT id, email, name, avatar, provider, created_at 
+    SELECT id, email, name, avatar, address, provider, created_at 
     FROM users 
     WHERE id = ${id} 
     LIMIT 1
@@ -31,12 +31,12 @@ export async function queryUserById(id) {
 /**
  * Mendaftarkan user baru (Email/Password)
  */
-export async function queryInsertUser({ email, name, password, avatar = '', provider = 'local' }) {
+export async function queryInsertUser({ email, name, password, avatar = '', address = '', provider = 'local' }) {
   const sql = getDb();
   const rows = await sql`
-    INSERT INTO users (email, name, password, avatar, provider) 
-    VALUES (${email.trim().toLowerCase()}, ${name.trim()}, ${password}, ${avatar}, ${provider})
-    RETURNING id, email, name, avatar, provider, created_at
+    INSERT INTO users (email, name, password, avatar, address, provider) 
+    VALUES (${email.trim().toLowerCase()}, ${name.trim()}, ${password}, ${avatar}, ${address}, ${provider})
+    RETURNING id, email, name, avatar, address, provider, created_at
   `;
   return rows[0];
 }
@@ -59,9 +59,25 @@ export async function queryUpsertGoogleUser({ email, name, avatar = '' }) {
   }
 
   const rows = await sql`
-    INSERT INTO users (email, name, password, avatar, provider) 
-    VALUES (${cleanEmail}, ${cleanName}, '', ${avatar}, 'google')
-    RETURNING id, email, name, avatar, provider, created_at
+    INSERT INTO users (email, name, password, avatar, address, provider) 
+    VALUES (${cleanEmail}, ${cleanName}, '', ${avatar}, '', 'google')
+    RETURNING id, email, name, avatar, address, provider, created_at
   `;
   return rows[0];
+}
+
+/**
+ * Update profil user (Nama & Alamat Bisnis)
+ */
+export async function queryUpdateUserProfile({ id, name, address }) {
+  const sql = getDb();
+  const rows = await sql`
+    UPDATE users 
+    SET 
+      name = COALESCE(${name ? name.trim() : null}, name), 
+      address = COALESCE(${address !== undefined ? address.trim() : null}, address)
+    WHERE id = ${id}
+    RETURNING id, email, name, avatar, address, provider, created_at
+  `;
+  return rows[0] || null;
 }

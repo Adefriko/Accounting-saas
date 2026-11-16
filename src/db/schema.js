@@ -17,10 +17,18 @@ export async function initializeDatabase() {
       name VARCHAR(255) NOT NULL,
       password VARCHAR(255),
       avatar TEXT,
+      address TEXT DEFAULT '',
       provider VARCHAR(50) DEFAULT 'local',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `;
+
+  // Pastikan kolom address tersedia jika tabel sudah ada sebelumnya
+  try {
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT DEFAULT ''`;
+  } catch {
+    // Abaikan jika sudah ada
+  }
 
   await sql`
     CREATE TABLE IF NOT EXISTS accounts (

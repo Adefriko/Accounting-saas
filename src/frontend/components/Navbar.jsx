@@ -10,7 +10,13 @@ import {
   User
 } from 'lucide-react';
 
-export default function Navbar({ activeMenu, onSelectMenu, currentUser, onLogout }) {
+export default function Navbar({ 
+  activeMenu, 
+  onSelectMenu, 
+  currentUser, 
+  onLogout,
+  onOpenAccount 
+}) {
   const navItems = [
     { id: 'Dashboard', label: 'Beranda', icon: LayoutDashboard },
     { id: 'Chart of Accounts', label: 'Daftar Akun', icon: BookOpen },
@@ -18,7 +24,6 @@ export default function Navbar({ activeMenu, onSelectMenu, currentUser, onLogout
     { id: 'Laporan Keuangan', label: 'Laporan', icon: TrendingUp },
   ];
 
-  // Ambil inisial nama
   const initials = currentUser?.name
     ? currentUser.name
         .split(' ')
@@ -64,12 +69,23 @@ export default function Navbar({ activeMenu, onSelectMenu, currentUser, onLogout
 
         {/* Right Section: Workspace & User Profile */}
         <div className="topbar-right">
-          <button className="icon-btn" title="Notifikasi">
-            <Bell size={16} />
+          {/* Akun Saya Button */}
+          <button
+            className="btn-moneva-outline btn-account-pill"
+            onClick={onOpenAccount}
+            title="Buka Keterangan Akun Saya & Alamat"
+          >
+            <User size={14} />
+            <span>Akun Saya</span>
           </button>
 
           {/* User Badge */}
-          <div className="workspace-badge" title={currentUser?.email || 'User'}>
+          <div 
+            className="workspace-badge" 
+            onClick={onOpenAccount}
+            style={{ cursor: 'pointer' }}
+            title="Klik untuk membuka Keterangan Akun Saya"
+          >
             <div className="workspace-avatar">
               {currentUser?.avatar ? (
                 <img 
