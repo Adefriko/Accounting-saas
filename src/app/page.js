@@ -11,22 +11,21 @@ import AccountModal from '@/frontend/components/AccountModal';
 import DashboardView from '@/frontend/views/DashboardView';
 import AccountsView from '@/frontend/views/AccountsView';
 import JournalView from '@/frontend/views/JournalView';
+import RecurringJournalView from '@/frontend/views/RecurringJournalView';
 import ReportsView from '@/frontend/views/ReportsView';
 
 export default function HomePage() {
-  // Auth & Session States
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
 
-  // Navigation & Core States
   const [activeMenu, setActiveMenu] = useState('Dashboard');
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [recurringRules, setRecurringRules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState([]);
 
-  // Feature specific states
   const [dashboardData, setDashboardData] = useState(null);
   const [ledgerAccount, setLedgerAccount] = useState('');
   const [ledgerData, setLedgerData] = useState(null);
@@ -36,7 +35,6 @@ export default function HomePage() {
   const [cashflowAccount, setCashflowAccount] = useState('');
   const [cashflowData, setCashflowData] = useState(null);
 
-  // Helper auth header
   const getAuthHeaders = useCallback(() => {
     const headers = { 'Content-Type': 'application/json' };
     if (currentUser?.token) headers['Authorization'] = `Bearer ${currentUser.token}`;
@@ -44,24 +42,18 @@ export default function HomePage() {
     return headers;
   }, [currentUser]);
 
-  // Toast Helper
   const addToast = useCallback((message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 4000);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   }, []);
 
-  // Check stored user session on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem('moneva_user_session');
-      if (stored) {
-        setCurrentUser(JSON.parse(stored));
-      }
+      if (stored) setCurrentUser(JSON.parse(stored));
     } catch {
-      console.warn('Session parsing error');
+      console.warn('Session error');
     } finally {
       setAuthChecking(false);
     }
@@ -74,9 +66,7 @@ export default function HomePage() {
       if (typeof document !== 'undefined') {
         document.cookie = `moneva_session=${encodeURIComponent(user.token || user.id)}; path=/; max-age=604800; SameSite=Lax`;
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     addToast(`Selamat datang, ${user.name}!`);
   };
 
@@ -85,298 +75,217 @@ export default function HomePage() {
     setIsAccountModalOpen(false);
     try {
       localStorage.removeItem('moneva_user_session');
-      if (typeof document !== 'undefined') {
-        document.cookie = 'moneva_session=; path=/; max-age=0;';
-      }
-    } catch (e) {
-      console.error(e);
-    }
+      if (typeof document !== 'undefined') document.cookie = 'moneva_session=; path=/; max-age=0;';
+    } catch (e) { console.error(e); }
     addToast('Anda telah keluar dari Moneva.', 'info');
   };
 
-  // ==========================================
-  // FETCH API HANDLERS (TERPROTEKSI AUTH)
-  // ==========================================
+  // API Fetch Handlers
   const fetchAccounts = useCallback(async () => {
     try {
-      const res = await fetch(`/api/accounts?t=${Date.now()}`, { 
-        headers: getAuthHeaders(),
-        cache: 'no-store'
-      });
+      const res = await fetch(`/api/accounts?t=${Date.now()}`, { headers: getAuthHeaders(), cache: 'no-store' });
       if (res.status === 401) { handleLogout(); return; }
       const data = await res.json();
       if (res.ok) setAccounts(Array.isArray(data) ? data : []);
-      else addToast(data.error || 'Gagal memuat akun', 'error');
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-    }
+    } catch { addToast('Gagal memuat akun', 'error'); }
   }, [getAuthHeaders, addToast]);
 
   const fetchTransactions = useCallback(async () => {
     try {
-      const res = await fetch(`/api/transactions?t=${Date.now()}`, { 
-        headers: getAuthHeaders(),
-        cache: 'no-store'
-      });
+      const res = await fetch(`/api/transactions?t=${Date.now()}`, { headers: getAuthHeaders(), cache: 'no-store' });
       if (res.status === 401) { handleLogout(); return; }
       const data = await res.json();
       if (res.ok) setTransactions(Array.isArray(data) ? data : []);
-      else addToast(data.error || 'Gagal memuat transaksi', 'error');
-    } catch {
-      console.error('Error fetching transactions');
-    }
-  }, [getAuthHeaders, addToast]);
+    } catch { console.error('Error fetching tx'); }
+  }, [getAuthHeaders]);
 
   const fetchDashboard = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/dashboard?t=${Date.now()}`, { 
-        headers: getAuthHeaders(),
-        cache: 'no-store'
-      });
+      const res = await fetch(`/api/dashboard?t=${Date.now()}`, { headers: getAuthHeaders(), cache: 'no-store' });
       if (res.status === 401) { handleLogout(); return; }
       const data = await res.json();
       if (res.ok) setDashboardData(data);
-      else addToast(data.error || 'Gagal memuat dashboard', 'error');
-    } catch {
-      addToast('Koneksi database bermasalah', 'error');
-    } finally {
-      setLoading(false);
-    }
+    } catch { addToast('Koneksi database bermasalah', 'error'); } 
+    finally { setLoading(false); }
   }, [getAuthHeaders, addToast]);
+
+  const fetchRecurringRules = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/recurring?t=${Date.now()}`, { headers: getAuthHeaders(), cache: 'no-store' });
+      if (res.status === 401) { handleLogout(); return; }
+      const data = await res.json();
+      if (res.ok) setRecurringRules(Array.isArray(data) ? data : []);
+    } catch { console.error('Error fetching recurring'); }
+  }, [getAuthHeaders]);
+
+  const fetchReports = useCallback(async () => {
+    try {
+      const [isRes, bsRes, tbRes, cfRes] = await Promise.all([
+        fetch('/api/income-statement', { headers: getAuthHeaders() }),
+        fetch('/api/balance-sheet', { headers: getAuthHeaders() }),
+        fetch('/api/trial-balance', { headers: getAuthHeaders() }),
+        fetch(cashflowAccount ? `/api/cashflow?account=${encodeURIComponent(cashflowAccount)}` : '/api/cashflow', { headers: getAuthHeaders() })
+      ]);
+      if (isRes.ok) setIncomeStatementData(await isRes.json());
+      if (bsRes.ok) setBalanceSheetData(await bsRes.json());
+      if (tbRes.ok) setTrialBalanceData(await tbRes.json());
+      if (cfRes.ok) {
+        const cfData = await cfRes.json();
+        setCashflowData(cfData);
+        if (cfData.selected_account && !cashflowAccount) setCashflowAccount(cfData.selected_account);
+      }
+    } catch { console.error('Error fetching reports'); }
+  }, [cashflowAccount, getAuthHeaders]);
 
   const fetchLedger = useCallback(async (accName) => {
     if (!accName) return;
     try {
       const res = await fetch(`/api/ledger?account=${encodeURIComponent(accName)}`, { headers: getAuthHeaders() });
-      const data = await res.json();
-      if (res.ok) setLedgerData(data);
-    } catch {
-      console.error('Error fetching ledger');
-    }
+      if (res.ok) setLedgerData(await res.json());
+    } catch { console.error('Error fetching ledger'); }
   }, [getAuthHeaders]);
 
-  const fetchTrialBalance = useCallback(async () => {
-    try {
-      const res = await fetch('/api/trial-balance', { headers: getAuthHeaders() });
-      const data = await res.json();
-      if (res.ok) setTrialBalanceData(data);
-    } catch {
-      console.error('Error fetching trial balance');
-    }
-  }, [getAuthHeaders]);
-
-  const fetchIncomeStatement = useCallback(async () => {
-    try {
-      const res = await fetch('/api/income-statement', { headers: getAuthHeaders() });
-      const data = await res.json();
-      if (res.ok) setIncomeStatementData(data);
-    } catch {
-      console.error('Error fetching income statement');
-    }
-  }, [getAuthHeaders]);
-
-  const fetchBalanceSheet = useCallback(async () => {
-    try {
-      const res = await fetch('/api/balance-sheet', { headers: getAuthHeaders() });
-      const data = await res.json();
-      if (res.ok) setBalanceSheetData(data);
-    } catch {
-      console.error('Error fetching balance sheet');
-    }
-  }, [getAuthHeaders]);
-
-  const fetchCashflow = useCallback(async (accName) => {
-    try {
-      const url = accName ? `/api/cashflow?account=${encodeURIComponent(accName)}` : '/api/cashflow';
-      const res = await fetch(url, { headers: getAuthHeaders() });
-      const data = await res.json();
-      if (res.ok) {
-        setCashflowData(data);
-        if (data.selected_account && !cashflowAccount) setCashflowAccount(data.selected_account);
-      }
-    } catch {
-      console.error('Error fetching cashflow');
-    }
-  }, [cashflowAccount, getAuthHeaders]);
-
-  // Initial load when logged in
   useEffect(() => {
     if (currentUser) {
       fetchAccounts();
       fetchTransactions();
       fetchDashboard();
+      fetchRecurringRules();
     }
-  }, [currentUser, fetchAccounts, fetchTransactions, fetchDashboard]);
+  }, [currentUser, fetchAccounts, fetchTransactions, fetchDashboard, fetchRecurringRules]);
 
-  // Tab switch effect
   useEffect(() => {
     if (!currentUser) return;
-    if (activeMenu === 'Dashboard') {
-      fetchDashboard();
-      fetchTransactions();
-    } else if (activeMenu === 'Chart of Accounts') {
-      fetchAccounts();
-    } else if (activeMenu === 'Input Journal') {
-      fetchAccounts();
-      fetchTransactions();
-    } else if (activeMenu === 'Laporan Keuangan') {
-      fetchAccounts();
-      fetchTransactions();
-      fetchIncomeStatement();
-      fetchBalanceSheet();
-      fetchCashflow(cashflowAccount);
-      fetchTrialBalance();
+    if (activeMenu === 'Dashboard') { fetchDashboard(); fetchTransactions(); fetchAccounts(); }
+    else if (activeMenu === 'Chart of Accounts') { fetchAccounts(); }
+    else if (activeMenu === 'Input Journal') { fetchAccounts(); fetchTransactions(); }
+    else if (activeMenu === 'Jurnal Otomatis') { fetchRecurringRules(); fetchAccounts(); }
+    else if (activeMenu === 'Laporan Keuangan') {
+      fetchAccounts(); fetchTransactions(); fetchReports();
       if (accounts.length > 0 && !ledgerAccount) {
         setLedgerAccount(accounts[0].account);
         fetchLedger(accounts[0].account);
-      } else if (ledgerAccount) {
-        fetchLedger(ledgerAccount);
-      }
+      } else if (ledgerAccount) { fetchLedger(ledgerAccount); }
     }
-  }, [
-    currentUser, activeMenu, ledgerAccount, cashflowAccount, accounts.length,
-    fetchAccounts, fetchTransactions, fetchDashboard, fetchLedger,
-    fetchTrialBalance, fetchIncomeStatement, fetchBalanceSheet, fetchCashflow
-  ]);
+  }, [currentUser, activeMenu, ledgerAccount, cashflowAccount, accounts.length, fetchAccounts, fetchTransactions, fetchDashboard, fetchRecurringRules, fetchReports, fetchLedger]);
 
-  // ==========================================
-  // ACTION HANDLERS (DB MUTATIONS)
-  // ==========================================
+  // Action Handlers
   const handleAddAccount = async (payload) => {
-    if (!payload.account.trim()) {
-      addToast('Nama akun tidak boleh kosong!', 'error');
-      return false;
-    }
     try {
-      const res = await fetch('/api/accounts', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(payload)
-      });
+      const res = await fetch('/api/accounts', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload) });
       const data = await res.json();
-      if (res.ok) {
-        addToast(data.message);
-        await fetchAccounts();
-        await fetchDashboard();
-        return true;
-      }
-      addToast(data.error || 'Gagal menambah akun', 'error');
-      return false;
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-      return false;
-    }
+      if (res.ok) { addToast(data.message); await fetchAccounts(); await fetchDashboard(); return true; }
+      addToast(data.error || 'Gagal menambah akun', 'error'); return false;
+    } catch { addToast('Kesalahan server', 'error'); return false; }
   };
 
   const handleSeedStandardAccounts = async () => {
     try {
-      const res = await fetch('/api/accounts', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ action: 'seed' })
-      });
+      const res = await fetch('/api/accounts', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ action: 'seed' }) });
       const data = await res.json();
-      if (res.ok) {
-        addToast(data.message);
-        await fetchAccounts();
-        await fetchDashboard();
-      } else addToast(data.error || 'Gagal menambahkan akun standar', 'error');
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-    }
+      if (res.ok) { addToast(data.message); await fetchAccounts(); await fetchDashboard(); }
+      else addToast(data.error || 'Gagal menambahkan akun standar', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
   };
 
-  const handleDeleteAccount = async (accountName) => {
-    if (!window.confirm(`Hapus akun '${accountName}'?`)) return;
+  const handleDeleteAccount = async (name) => {
+    if (!window.confirm(`Hapus akun '${name}'?`)) return;
     try {
-      const res = await fetch(`/api/accounts/${encodeURIComponent(accountName)}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
+      const res = await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: 'DELETE', headers: getAuthHeaders() });
       const data = await res.json();
-      if (res.ok) {
-        addToast(data.message);
-        await fetchAccounts();
-        await fetchDashboard();
-      } else addToast(data.error || 'Gagal menghapus akun', 'error');
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-    }
+      if (res.ok) { addToast(data.message); await fetchAccounts(); await fetchDashboard(); }
+      else addToast(data.error || 'Gagal menghapus akun', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
   };
 
   const handleAddTransaction = async (txPayload) => {
-    if (txPayload.debit === txPayload.credit) {
-      addToast('Akun Debit dan Credit tidak boleh sama!', 'error');
-      return false;
-    }
-    const amt = parseFloat(txPayload.amount);
-    if (isNaN(amt) || amt <= 0) {
-      addToast('Nominal harus lebih dari 0!', 'error');
-      return false;
-    }
     try {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(txPayload)
-      });
+      const res = await fetch('/api/transactions', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(txPayload) });
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await fetchTransactions();
-        await fetchAccounts();
-        await fetchDashboard();
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard()]);
         return true;
       }
-      addToast(data.error || 'Gagal menyimpan transaksi', 'error');
-      return false;
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-      return false;
-    }
+      addToast(data.error || 'Gagal menyimpan transaksi', 'error'); return false;
+    } catch { addToast('Kesalahan server', 'error'); return false; }
   };
 
   const handleDeleteTransaction = async (id) => {
     if (!window.confirm('Batalkan transaksi ini?')) return;
     try {
-      const res = await fetch(`/api/transactions/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
+      const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+      const data = await res.json();
+      if (res.ok) { addToast(data.message); await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard()]); }
+      else addToast(data.error || 'Gagal menghapus', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
+  };
+
+  // Recurring Action Handlers
+  const handleAddRecurringRule = async (rulePayload) => {
+    try {
+      const res = await fetch('/api/recurring', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(rulePayload) });
+      const data = await res.json();
+      if (res.ok) { addToast(data.message); await fetchRecurringRules(); return true; }
+      addToast(data.error || 'Gagal menambah aturan rutin', 'error'); return false;
+    } catch { addToast('Kesalahan server', 'error'); return false; }
+  };
+
+  const handleDeleteRecurringRule = async (id, name) => {
+    if (!window.confirm(`Hapus aturan jurnal otomatis '${name}'?`)) return;
+    try {
+      const res = await fetch(`/api/recurring/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+      const data = await res.json();
+      if (res.ok) { addToast(data.message); await fetchRecurringRules(); }
+      else addToast(data.error || 'Gagal menghapus aturan', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
+  };
+
+  const handleExecuteRecurringRule = async (id) => {
+    try {
+      const res = await fetch(`/api/recurring/${id}`, { method: 'POST', headers: getAuthHeaders() });
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await fetchTransactions();
-        await fetchAccounts();
-        await fetchDashboard();
-      } else addToast(data.error || 'Gagal menghapus transaksi', 'error');
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-    }
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchRecurringRules()]);
+      } else addToast(data.error || 'Gagal mengeksekusi', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
+  };
+
+  const handleExecuteAllRecurring = async () => {
+    try {
+      const res = await fetch('/api/recurring', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ action: 'execute_all' }) });
+      const data = await res.json();
+      if (res.ok) {
+        addToast(data.message);
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchRecurringRules()]);
+      } else addToast(data.error || 'Gagal mengeksekusi rutin', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
+  };
+
+  const handleSeedDefaultRecurring = async () => {
+    try {
+      const res = await fetch('/api/recurring', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ action: 'seed' }) });
+      const data = await res.json();
+      if (res.ok) { addToast(data.message); await Promise.all([fetchRecurringRules(), fetchAccounts()]); }
+      else addToast(data.error || 'Gagal memuat template', 'error');
+    } catch { addToast('Kesalahan server', 'error'); }
   };
 
   const handleResetDatabase = async () => {
     if (!window.confirm('🔴 PERINGATAN: Apakah Anda yakin ingin mereset seluruh database?')) return;
     try {
-      const res = await fetch('/api/reset', {
-        method: 'POST',
-        headers: getAuthHeaders()
-      });
+      const res = await fetch('/api/reset', { method: 'POST', headers: getAuthHeaders() });
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await fetchAccounts();
-        await fetchTransactions();
-        await fetchDashboard();
+        await Promise.all([fetchAccounts(), fetchTransactions(), fetchDashboard(), fetchRecurringRules()]);
         setActiveMenu('Dashboard');
       } else addToast(data.error || 'Gagal melakukan reset', 'error');
-    } catch {
-      addToast('Terjadi kesalahan koneksi server', 'error');
-    }
+    } catch { addToast('Kesalahan server', 'error'); }
   };
 
-  // Loading Session Spinner
   if (authChecking) {
     return (
       <div className="app-wrapper flex-center" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -385,7 +294,6 @@ export default function HomePage() {
     );
   }
 
-  // Not Logged In -> Show Auth Screen
   if (!currentUser) {
     return (
       <div className="app-wrapper">
@@ -400,7 +308,6 @@ export default function HomePage() {
     <div className="app-wrapper">
       <ToastContainer toasts={toasts} />
 
-      {/* Moneva Topbar Navigation with Akun Saya */}
       <Navbar
         activeMenu={activeMenu}
         onSelectMenu={setActiveMenu}
@@ -409,28 +316,20 @@ export default function HomePage() {
         onOpenAccount={() => setIsAccountModalOpen(true)}
       />
 
-      {/* Modal Keterangan Akun Saya & Alamat */}
       {isAccountModalOpen && (
         <AccountModal
           user={currentUser}
           onClose={() => setIsAccountModalOpen(false)}
           onUpdateUser={(updated) => {
             setCurrentUser(updated);
-            try {
-              localStorage.setItem('moneva_user_session', JSON.stringify(updated));
-            } catch (e) {
-              console.error(e);
-            }
+            try { localStorage.setItem('moneva_user_session', JSON.stringify(updated)); }
+            catch (e) { console.error(e); }
           }}
           onLogout={handleLogout}
-          onSwitchAccount={() => {
-            setIsAccountModalOpen(false);
-            handleLogout();
-          }}
+          onSwitchAccount={() => { setIsAccountModalOpen(false); handleLogout(); }}
         />
       )}
 
-      {/* Main View Area with Slide Animation */}
       <main className="main-container">
         {loading && activeMenu === 'Dashboard' && !dashboardData ? (
           <LoadingSpinner message="Menghubungkan & mengambil data pembukuan dari cloud database..." />
@@ -467,6 +366,19 @@ export default function HomePage() {
               />
             )}
 
+            {activeMenu === 'Jurnal Otomatis' && (
+              <RecurringJournalView
+                rules={recurringRules}
+                accounts={accounts}
+                onAddRule={handleAddRecurringRule}
+                onDeleteRule={handleDeleteRecurringRule}
+                onExecuteRule={handleExecuteRecurringRule}
+                onExecuteAll={handleExecuteAllRecurring}
+                onSeedDefaultRules={handleSeedDefaultRecurring}
+                onNavigateToJournal={() => setActiveMenu('Input Journal')}
+              />
+            )}
+
             {activeMenu === 'Laporan Keuangan' && (
               <ReportsView
                 incomeStatementData={incomeStatementData}
@@ -476,15 +388,9 @@ export default function HomePage() {
                 trialBalanceData={trialBalanceData}
                 accounts={accounts}
                 ledgerAccount={ledgerAccount}
-                onSelectLedgerAccount={acc => {
-                  setLedgerAccount(acc);
-                  fetchLedger(acc);
-                }}
+                onSelectLedgerAccount={acc => { setLedgerAccount(acc); fetchLedger(acc); }}
                 cashflowAccount={cashflowAccount}
-                onSelectCashflowAccount={acc => {
-                  setCashflowAccount(acc);
-                  fetchCashflow(acc);
-                }}
+                onSelectCashflowAccount={acc => { setCashflowAccount(acc); fetchReports(); }}
               />
             )}
           </div>

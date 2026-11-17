@@ -186,9 +186,7 @@ body {
 /* Footer */
 .footer-moneva { border-top: 1px solid var(--border-light); padding: 20px 24px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-muted); background: #fff; }
 
-/* ==========================================================================
-   AUTHENTICATION SCREEN & GOOGLE LOGIN
-   ========================================================================== */
+/* Authentication Screen */
 .auth-wrapper { min-height: 82vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
 .auth-card { max-width: 440px; width: 100%; background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 32px; box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08); text-align: center; }
 .auth-header { margin-bottom: 24px; }
@@ -220,7 +218,7 @@ body {
 .btn-demo-quick:hover { background: var(--brand-teal-hover); }
 .auth-footer-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--text-muted); margin-top: 18px; }
 
-/* Google OAuth Dialog */
+/* Google Modal */
 .google-modal-box { background: #ffffff; border-radius: var(--radius-xl); max-width: 420px; width: 100%; padding: 24px; box-shadow: var(--shadow-modal); animation: modalPop 0.2s ease; text-align: center; }
 .google-icon-circle { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
 .google-modal-header h3 { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
@@ -240,9 +238,7 @@ body {
 .btn-modal-cancel:hover { color: var(--text-dark); }
 .text-teal { color: var(--brand-teal); }
 
-/* ==========================================================================
-   AKUN SAYA & ALAMAT BISNIS MODAL
-   ========================================================================== */
+/* Akun Saya Modal */
 .account-modal-window { max-width: 520px; }
 .account-modal-header-title { display: flex; align-items: center; gap: 10px; }
 .account-profile-card { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-muted); border-radius: var(--radius-lg); border: 1px solid var(--border-light); }
@@ -265,11 +261,41 @@ body {
 .account-auth-actions h4 { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 10px; }
 .account-auth-buttons { display: flex; gap: 10px; }
 
+/* ==========================================================================
+   JURNAL OTOMATIS & RECURRING RULES (ENTERPRISE UMKM)
+   ========================================================================== */
+.badge-enterprise { font-size: 10px; font-weight: 700; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; border-radius: var(--radius-pill); padding: 3px 9px; letter-spacing: 0.04em; }
+.btn-auto-exec { background: linear-gradient(135deg, #006d5b 0%, #0d9488 100%); box-shadow: 0 3px 12px rgba(0, 109, 91, 0.25); }
+.btn-auto-exec:hover { filter: brightness(1.06); }
+.auto-empty-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--bg-teal-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.recurring-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 18px; }
+.recurring-item-card { background: #ffffff; border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.15s ease; }
+.recurring-item-card:hover { border-color: var(--brand-teal); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06); }
+.recurring-item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.recurring-category-badge { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--brand-teal); background: var(--bg-teal-subtle); padding: 2px 8px; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 6px; }
+.recurring-item-title { font-size: 15.5px; font-weight: 700; color: var(--text-dark); }
+.recurring-amount { font-size: 16.5px; font-weight: 800; color: var(--brand-teal); }
+.recurring-accounts-flow { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12px; flex-wrap: wrap; }
+.account-tag { padding: 3px 8px; border-radius: var(--radius-xs); font-weight: 600; }
+.account-tag.debit { background: #dcfce7; color: #166534; }
+.account-tag.credit { background: #ffedd5; color: #c2410c; }
+.flow-arrow { color: var(--text-muted); font-size: 11px; }
+.recurring-desc { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4; }
+.recurring-item-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border-subtle); gap: 10px; }
+.recurring-schedule-info { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-muted); flex-wrap: wrap; }
+.last-run-badge { font-size: 10px; background: #f1f5f9; color: var(--text-secondary); padding: 2px 6px; border-radius: 4px; }
+.recurring-actions { display: flex; align-items: center; gap: 8px; }
+.btn-exec-single { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: var(--bg-teal-subtle); color: var(--brand-teal); border: 1px solid var(--border-teal); border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.btn-exec-single:hover { background: var(--brand-teal); color: #ffffff; }
+.btn-delete-icon { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-light); background: transparent; color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+.btn-delete-icon:hover { background: #fff1f2; color: var(--brand-rose); border-color: #fda4af; }
+
 /* Responsive */
 @media (max-width: 960px) {
   .metrics-row-moneva { grid-template-columns: repeat(2, 1fr); }
   .topbar-content { flex-wrap: wrap; gap: 12px; }
   .page-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .recurring-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .metrics-row-moneva { grid-template-columns: 1fr; }

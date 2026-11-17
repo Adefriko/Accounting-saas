@@ -4,6 +4,7 @@ import {
   LayoutDashboard, 
   BookOpen, 
   FileSpreadsheet, 
+  Zap,
   TrendingUp, 
   LogOut, 
   UserCircle2
@@ -20,6 +21,7 @@ export default function Navbar({
     { id: 'Dashboard', label: 'Beranda', icon: LayoutDashboard },
     { id: 'Chart of Accounts', label: 'Daftar Akun', icon: BookOpen },
     { id: 'Input Journal', label: 'Jurnal Umum', icon: FileSpreadsheet },
+    { id: 'Jurnal Otomatis', label: 'Jurnal Otomatis', icon: Zap },
     { id: 'Laporan Keuangan', label: 'Laporan', icon: TrendingUp },
   ];
 

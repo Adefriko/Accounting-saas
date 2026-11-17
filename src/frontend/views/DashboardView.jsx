@@ -13,7 +13,8 @@ import {
   BookOpen,
   FileSpreadsheet,
   Calendar,
-  Sparkles
+  Sparkles,
+  Zap
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -367,13 +368,13 @@ export default function DashboardView({
             </div>
 
             <div 
-              onClick={() => onNavigate('Chart of Accounts')}
+              onClick={() => onNavigate('Jurnal Otomatis')}
               style={{ border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', padding: '16px 14px', cursor: 'pointer', transition: 'all 0.15s', background: '#fff' }}
               onMouseOver={e => e.currentTarget.style.borderColor = 'var(--brand-teal)'}
               onMouseOut={e => e.currentTarget.style.borderColor = 'var(--border-light)'}
             >
-              <div style={{ color: 'var(--brand-teal)', marginBottom: 10 }}><FileSpreadsheet size={20} /></div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-dark)' }}>Kelola akun</div>
+              <div style={{ color: 'var(--brand-teal)', marginBottom: 10 }}><Zap size={20} /></div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-dark)' }}>Jurnal otomatis</div>
             </div>
           </div>
         </div>
