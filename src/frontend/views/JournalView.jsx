@@ -103,9 +103,9 @@ export default function JournalView({
       {/* Page Header */}
       <div className="page-header">
         <div className="page-header-text">
-          <span className="super-tag">PENCATATAN TRANSAKSI</span>
+          <span className="super-tag">BUKU HARIAN</span>
           <h1 className="page-title">Jurnal Umum</h1>
-          <p className="page-subtitle">Catat setiap aktivitas keuangan dengan debit dan kredit yang seimbang.</p>
+          <p className="page-subtitle">Catatan riwayat mutasi debit dan kredit usaha.</p>
         </div>
 
         <div className="page-actions">
@@ -116,32 +116,26 @@ export default function JournalView({
 
           <button onClick={handleOpenModal} className="btn-moneva-primary">
             <Plus size={16} />
-            <span>Buat Jurnal Baru</span>
+            <span>Catat Jurnal</span>
           </button>
         </div>
-      </div>
-
-      {/* Info Alert Box */}
-      <div className="info-alert-box">
-        <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
-        <span>Setiap jurnal membutuhkan minimal dua baris akun berpasangan. Total debit harus sama dengan total kredit sebelum disimpan.</span>
       </div>
 
       {/* Main Content Card */}
       <div className="moneva-card">
         {/* Top Summary Stat Bar */}
-        <div style={{ display: 'flex', gap: 40, borderBottom: '1px solid var(--border-light)', paddingBottom: 20, marginBottom: 24 }}>
+        <div style={{ display: 'flex', gap: 40, borderBottom: '1px solid var(--border-light)', paddingBottom: 20, marginBottom: 20 }}>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-dark)' }}>{transactions.length}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total jurnal periode ini</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total Transaksi</div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-dark)' }}>{formatRupiah(totalDebit)}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total debit tercatat</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total Debit</div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-dark)' }}>{formatRupiah(totalDebit)}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total kredit tercatat</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total Kredit</div>
           </div>
         </div>
 
@@ -246,7 +240,7 @@ export default function JournalView({
         {/* Table Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, fontSize: 12, color: 'var(--text-muted)' }}>
           <span>Menampilkan {filteredTransactions.length} dari {transactions.length} jurnal</span>
-          <span>Klik tombol Hapus untuk membatalkan transaksi yang salah</span>
+          <span>{filteredTransactions.length > 0 ? 'Data tersinkronisasi' : ''}</span>
         </div>
       </div>
 

@@ -101,10 +101,10 @@ export default function AuthScreen({ onLoginSuccess }) {
             <span className="brand-name-moneva" style={{ fontSize: '1.4rem' }}>moneva</span>
           </div>
           <h1 className="auth-title">
-            {mode === 'login' ? 'Masuk ke Akun Anda' : 'Buat Akun Bisnis Baru'}
+            {mode === 'login' ? 'Masuk ke Moneva' : 'Buat Akun Bisnis'}
           </h1>
           <p className="auth-subtitle">
-            Platform akuntansi modern ramah pengguna untuk UMKM & bisnis berkembang.
+            Kelola keuangan usaha jadi lebih mudah dan teratur.
           </p>
         </div>
 
@@ -221,7 +221,7 @@ export default function AuthScreen({ onLoginSuccess }) {
         <div className="auth-demo-box">
           <div className="demo-header">
             <Sparkles size={16} className="text-teal" />
-            <span>Mode Demo & Evaluasi:</span>
+            <span>Mode Demo:</span>
           </div>
           <button
             type="button"
@@ -229,13 +229,13 @@ export default function AuthScreen({ onLoginSuccess }) {
             onClick={handleDemoLogin}
             disabled={loading}
           >
-            Masuk Cepat Sebagai Owner (1-Klik)
+            Coba Akun Demo (1-Klik)
           </button>
         </div>
 
         <div className="auth-footer-note">
           <ShieldCheck size={14} />
-          <span>Sesi terenkripsi & data tersimpan di Neon PostgreSQL</span>
+          <span>Tersimpan aman & terenkripsi</span>
         </div>
       </div>
 

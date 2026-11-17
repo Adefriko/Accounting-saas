@@ -95,9 +95,9 @@ export default function ReportsView({
       {/* Page Header */}
       <div className="page-header">
         <div className="page-header-text">
-          <span className="super-tag">INSIGHT KEUANGAN</span>
+          <span className="super-tag">LAPORAN</span>
           <h1 className="page-title">Laporan Keuangan</h1>
-          <p className="page-subtitle">Lihat ringkasan posisi dan kinerja keuangan dengan tampilan yang mudah dipahami.</p>
+          <p className="page-subtitle">Ringkasan kinerja dan posisi finansial bisnis.</p>
         </div>
 
         <div className="page-actions">
@@ -164,7 +164,7 @@ export default function ReportsView({
                 <span className="dot-indicator" /> Ringkasan
               </span>
             </div>
-            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Akumulasi Periode Berjalan dari Database</p>
+            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Akumulasi transaksi periode berjalan</p>
 
             {/* Section 1: Pendapatan */}
             <div style={{ marginBottom: 20 }}>
@@ -225,8 +225,8 @@ export default function ReportsView({
 
           {/* Right Column: Sorotan Bulan Ini (Matches Reference 04) */}
           <div className="moneva-card" style={{ marginBottom: 0, height: 'fit-content' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Sorotan periode ini</h3>
-            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Margin laba bersih</p>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Sorotan Margin</h3>
+            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Rasio keuntungan bersih</p>
 
             <div style={{ fontSize: 44, fontWeight: 800, color: 'var(--brand-teal)', letterSpacing: '-0.03em', lineHeight: 1 }}>
               {netMargin}%
@@ -234,12 +234,12 @@ export default function ReportsView({
 
             <div style={{ margin: '12px 0 24px' }}>
               <span className={`trend-badge ${netProfit >= 0 ? 'trend-badge-teal' : 'trend-badge-rose'}`} style={{ padding: '4px 10px', fontSize: 12 }}>
-                {netProfit >= 0 ? 'Performa positif' : 'Perlu efisiensi'}
+                {netProfit >= 0 ? 'Performa Positif' : 'Perlu Efisiensi'}
               </span>
             </div>
 
             {/* Comparison Bars */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 6 }}>
                   <span style={{ color: 'var(--text-secondary)' }}>Pendapatan</span>
@@ -260,10 +260,6 @@ export default function ReportsView({
                 </div>
               </div>
             </div>
-
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, borderTop: '1px solid var(--border-light)', paddingTop: 16 }}>
-              Laporan laba rugi dihitung secara akrual otomatis dari seluruh transaksi jurnal debit & kredit yang telah Anda input ke database Neon PostgreSQL.
-            </div>
           </div>
         </div>
       )}
@@ -271,8 +267,8 @@ export default function ReportsView({
       {/* TAB 2: NERACA (BALANCE SHEET) */}
       {activeReportTab === 'Neraca' && (
         <div className="moneva-card">
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Balance Sheet (Neraca Akumulasi)</h3>
-          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Posisi Aset, Liabilitas, dan Ekuitas per Bulan dari Database</p>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Neraca Keuangan</h3>
+          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>Posisi aset, kewajiban, dan modal usaha</p>
 
           <div className="table-container">
             <table className="moneva-table">
@@ -313,8 +309,8 @@ export default function ReportsView({
         <div className="moneva-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Laporan Arus Kas</h3>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Pelacakan uang masuk dan keluar pada kas/bank</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Arus Kas</h3>
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Aliran dana penerimaan dan pengeluaran kas</p>
             </div>
             {cashflowData?.available_accounts?.length > 0 && (
               <div style={{ width: 220 }}>
@@ -361,8 +357,8 @@ export default function ReportsView({
         <div className="moneva-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Buku Besar (General Ledger)</h3>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Riwayat mutasi dan saldo berjalan per akun dari database</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Buku Besar</h3>
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Mutasi debit, kredit, dan saldo berjalan per akun</p>
             </div>
             {accounts.length > 0 && (
               <div style={{ width: 220 }}>
@@ -387,7 +383,7 @@ export default function ReportsView({
                   <th>KETERANGAN</th>
                   <th className="text-right">DEBIT</th>
                   <th className="text-right">KREDIT</th>
-                  <th className="text-right">SALDO BERJALAN</th>
+                  <th className="text-right">SALDO</th>
                 </tr>
               </thead>
               <tbody>
@@ -410,7 +406,7 @@ export default function ReportsView({
                 ) : (
                   <tr>
                     <td colSpan={5} style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)' }}>
-                      Belum ada mutasi transaksi untuk akun ini di database.
+                      Belum ada mutasi transaksi untuk akun ini.
                     </td>
                   </tr>
                 )}
@@ -425,12 +421,12 @@ export default function ReportsView({
         <div className="moneva-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Trial Balance (Neraca Saldo)</h3>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Pengecekan keseimbangan debit dan kredit buku besar</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Neraca Saldo</h3>
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Keseimbangan total debit dan kredit akun</p>
             </div>
             {trialBalanceData && (
               <span className={`status-pill ${trialBalanceData.balanced ? 'status-pill-active' : 'status-pill-cogs'}`}>
-                {trialBalanceData.balanced ? '✓ KESEIMBANGAN SEIMBANG (BALANCED)' : '✕ TIDAK SEIMBANG'}
+                {trialBalanceData.balanced ? '✓ Seimbang (Balanced)' : '✕ Tidak Seimbang'}
               </span>
             )}
           </div>

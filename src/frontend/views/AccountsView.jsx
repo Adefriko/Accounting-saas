@@ -75,9 +75,9 @@ export default function AccountsView({
       {/* Header */}
       <div className="page-header">
         <div className="page-header-text">
-          <span className="super-tag">PENGELOLAAN KEUANGAN</span>
+          <span className="super-tag">BAGAN AKUN</span>
           <h1 className="page-title">Daftar Akun</h1>
-          <p className="page-subtitle">Susun akun-akun akuntansi agar setiap transaksi tercatat pada kategori yang tepat.</p>
+          <p className="page-subtitle">Kelola klasifikasi akun untuk pencatatan keuangan bisnis yang teratur.</p>
         </div>
 
         <div className="page-actions">
@@ -95,34 +95,22 @@ export default function AccountsView({
         </div>
       </div>
 
-      {/* Info Alert Box */}
-      <div className="info-alert-box">
-        <Info size={18} style={{ flexShrink: 0 }} />
-        <span>Daftar akun mengikuti kategori dasar: Aset, Liabilitas, Ekuitas, Pendapatan, dan Beban. Saldo berjalan terhitung otomatis dari seluruh mutasi jurnal di database.</span>
-      </div>
-
       {/* Main Content Card */}
       <div className="moneva-card">
         {/* Top Mini Stats Bar */}
-        <div style={{ display: 'flex', gap: 40, borderBottom: '1px solid var(--border-light)', paddingBottom: 20, marginBottom: 24 }}>
+        <div style={{ display: 'flex', gap: 40, borderBottom: '1px solid var(--border-light)', paddingBottom: 20, marginBottom: 20 }}>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-dark)' }}>{accounts.length}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total akun</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Total Akun</div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-dark)' }}>{uniqueCategories}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Kelompok akun</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Kategori Akun</div>
           </div>
           <div>
             <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--brand-teal)' }}>{accounts.length}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Akun aktif</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Akun Aktif</div>
           </div>
-        </div>
-
-        {/* Section Title */}
-        <div style={{ marginBottom: 16 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Akun keuangan</h3>
-          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Kode akun yang rapi mempermudah proses jurnal.</p>
         </div>
 
         {/* Filter & Search Bar */}

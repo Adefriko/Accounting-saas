@@ -99,13 +99,10 @@ export default function RecurringJournalView({
       {/* Page Header */}
       <div className="page-header">
         <div className="page-header-text">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span className="super-tag">OTOMASI PEMBUKUAN ENTERPRISE</span>
-            <span className="badge-enterprise">AUTO-PILOT UMKM</span>
-          </div>
-          <h1 className="page-title">Jurnal Otomatis & Transaksi Rutin</h1>
+          <span className="super-tag">OTOMATISASI</span>
+          <h1 className="page-title">Jurnal Otomatis</h1>
           <p className="page-subtitle">
-            Konsep pembukuan modern perusahaan besar: transaksi rutin (gaji, sewa ruko, utilitas) tidak perlu diinput ulang satu per satu.
+            Jadwalkan dan catat pengeluaran rutin seperti gaji, sewa, dan utilitas tanpa input berulang.
           </p>
         </div>
 
@@ -115,16 +112,16 @@ export default function RecurringJournalView({
               onClick={handleTriggerAll} 
               className="btn-moneva-primary btn-auto-exec"
               disabled={executing}
-              title="Eksekusi semua aturan rutin aktif ke Jurnal Umum hari ini"
+              title="Eksekusi semua aturan rutin aktif ke Jurnal Umum"
             >
               <Zap size={16} />
-              <span>{executing ? 'Memproses...' : 'Jalankan Semua Rutin (1-Klik)'}</span>
+              <span>{executing ? 'Memproses...' : 'Jalankan Semua (1-Klik)'}</span>
             </button>
           )}
 
           <button onClick={handleOpenAddModal} className="btn-moneva-outline">
             <Plus size={16} />
-            <span>Tambah Aturan Rutin</span>
+            <span>Tambah Jadwal</span>
           </button>
         </div>
       </div>
@@ -136,10 +133,10 @@ export default function RecurringJournalView({
             <div className="metric-icon-circle metric-icon-teal">
               <Zap size={20} />
             </div>
-            <span className="trend-badge trend-badge-teal">Otomasi Aktif</span>
+            <span className="trend-badge trend-badge-teal">Jadwal Aktif</span>
           </div>
-          <div className="metric-value-moneva">{rules.length} Aturan</div>
-          <div className="metric-desc-moneva">Total jadwal transaksi rutin terdaftar</div>
+          <div className="metric-value-moneva">{rules.length} Rutin</div>
+          <div className="metric-desc-moneva">Total jadwal transaksi terdaftar</div>
         </div>
 
         <div className="metric-card-moneva">
@@ -147,10 +144,10 @@ export default function RecurringJournalView({
             <div className="metric-icon-circle metric-icon-orange">
               <Clock size={20} />
             </div>
-            <span className="trend-badge trend-badge-orange">Beban Bulanan</span>
+            <span className="trend-badge trend-badge-orange">Beban Rutin</span>
           </div>
           <div className="metric-value-moneva">{formatRupiah(totalMonthlyCommitment)}</div>
-          <div className="metric-desc-moneva">Estimasi pengeluaran rutin terikat per bulan</div>
+          <div className="metric-desc-moneva">Estimasi pengeluaran per bulan</div>
         </div>
 
         <div className="metric-card-moneva">
@@ -158,12 +155,12 @@ export default function RecurringJournalView({
             <div className="metric-icon-circle metric-icon-blue">
               <CheckCircle2 size={20} />
             </div>
-            <span className="trend-badge trend-badge-teal">Sinkron Realtime</span>
+            <span className="trend-badge trend-badge-teal">Status Jurnal</span>
           </div>
           <div className="metric-value-moneva" style={{ fontSize: 18, paddingTop: 4 }}>
-            Terhubung ke Laporan
+            Otomatis
           </div>
-          <div className="metric-desc-moneva">Sekali klik langsung update Laba Rugi & Neraca</div>
+          <div className="metric-desc-moneva">1-klik langsung masuk ke jurnal & laporan</div>
         </div>
       </div>
 
@@ -174,10 +171,10 @@ export default function RecurringJournalView({
             <Sparkles size={32} className="text-teal" />
           </div>
           <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 8 }}>
-            Belum Ada Aturan Jurnal Otomatis
+            Belum Ada Jadwal Transaksi Rutin
           </h2>
-          <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto 24px', lineHeight: 1.5 }}>
-            Hemat waktu pembukuan bisnis Anda. Daripada menginput manual setiap akhir bulan, gunakan template transaksi rutin siap pakai untuk UMKM di bawah ini.
+          <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 24px', lineHeight: 1.5 }}>
+            Hemat waktu pembukuan. Gunakan paket template siap pakai untuk mencatat pengeluaran berkala secara otomatis.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
@@ -187,13 +184,13 @@ export default function RecurringJournalView({
               style={{ padding: '12px 24px', fontSize: 14 }}
             >
               <Zap size={16} />
-              <span>Gunakan Paket Template Rutin UMKM (Gaji, Sewa, Listrik)</span>
+              <span>Gunakan Template Rutin UMKM</span>
             </button>
             <button 
               onClick={handleOpenAddModal} 
               className="btn-moneva-outline"
             >
-              Buat Aturan Kustom
+              Buat Kustom
             </button>
           </div>
         </div>
@@ -203,10 +200,10 @@ export default function RecurringJournalView({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
               <h3 style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-dark)' }}>
-                Daftar Aturan Transaksi Rutin UMKM
+                Daftar Transaksi Rutin
               </h3>
               <p style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                Klik tombol <strong>Jalankan Sekarang</strong> pada salah satu transaksi, atau gunakan tombol <strong>Jalankan Semua Rutin</strong> di atas.
+                Jalankan per transaksi atau sekaligus untuk membukukan langsung ke jurnal
               </p>
             </div>
 
@@ -215,7 +212,7 @@ export default function RecurringJournalView({
               className="btn-moneva-outline"
               style={{ fontSize: 12.5 }}
             >
-              <span>Buka Jurnal Umum</span>
+              <span>Lihat Jurnal Umum</span>
               <ArrowRight size={14} />
             </button>
           </div>
@@ -261,7 +258,7 @@ export default function RecurringJournalView({
                       title="Posting otomatis transaksi ini ke Jurnal Umum hari ini"
                     >
                       <Play size={13} />
-                      <span>Jalankan Sekarang</span>
+                      <span>Jalankan (1-Klik)</span>
                     </button>
 
                     <button

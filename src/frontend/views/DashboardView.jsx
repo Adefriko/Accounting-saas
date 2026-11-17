@@ -63,9 +63,9 @@ export default function DashboardView({
       {/* Page Header (Moneva Greeting Style) */}
       <div className="page-header">
         <div className="page-header-text">
-          <span className="super-tag">Hai, pengelola usaha! 👋</span>
-          <h1 className="page-title">Keuangan usahamu, makin jelas.</h1>
-          <p className="page-subtitle">Pantau pemasukan, pengeluaran, dan aktivitas usahamu di satu tempat langsung dari database cloud.</p>
+          <span className="super-tag">Ringkasan Finansial</span>
+          <h1 className="page-title">Keuangan Usaha Terkendali</h1>
+          <p className="page-subtitle">Pantau pemasukan, pengeluaran, dan saldo kas usaha secara langsung.</p>
         </div>
 
         <div className="page-actions">
@@ -113,7 +113,7 @@ export default function DashboardView({
             </span>
           </div>
           <div className="metric-value-moneva">{formatRupiah(totalRevenue)}</div>
-          <div className="metric-desc-moneva">Total pemasukan</div>
+          <div className="metric-desc-moneva">Pemasukan</div>
         </div>
 
         {/* Card 2: Total Pengeluaran */}
@@ -128,7 +128,7 @@ export default function DashboardView({
             </span>
           </div>
           <div className="metric-value-moneva">{formatRupiah(totalExpense)}</div>
-          <div className="metric-desc-moneva">Total pengeluaran</div>
+          <div className="metric-desc-moneva">Pengeluaran</div>
         </div>
 
         {/* Card 3: Laba Bersih */}
@@ -144,7 +144,7 @@ export default function DashboardView({
           <div className="metric-value-moneva" style={{ color: netProfit >= 0 ? 'var(--text-dark)' : 'var(--brand-rose)' }}>
             {formatRupiah(netProfit)}
           </div>
-          <div className="metric-desc-moneva">Laba bersih</div>
+          <div className="metric-desc-moneva">Laba Bersih</div>
         </div>
 
         {/* Card 4: Kas Tersedia */}
@@ -158,7 +158,7 @@ export default function DashboardView({
             </span>
           </div>
           <div className="metric-value-moneva">{formatRupiah(cashAvailable)}</div>
-          <div className="metric-desc-moneva">Kas tersedia (Saldo Aktiva)</div>
+          <div className="metric-desc-moneva">Kas Tersedia</div>
         </div>
       </div>
 
@@ -167,7 +167,7 @@ export default function DashboardView({
         {/* Arus Uang Usaha Card */}
         <div className="moneva-card" style={{ marginBottom: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Arus uang usaha</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Arus Kas Usaha</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 12, color: 'var(--text-secondary)' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#007a64' }} /> Pemasukan
@@ -178,7 +178,7 @@ export default function DashboardView({
             </div>
           </div>
           <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 20 }}>
-            Perbandingan uang masuk dan keluar dari database transaksi
+            Tren pemasukan dan pengeluaran berkala
           </p>
 
           <div style={{ width: '100%', height: 230 }}>
@@ -217,13 +217,13 @@ export default function DashboardView({
         <div className="moneva-card" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Ringkasan kas</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Ringkasan Kas</h3>
               <span className={`status-pill ${isCashHealthy ? 'status-pill-active' : 'status-pill-cogs'}`}>
                 <span className="dot-indicator" /> {isCashHealthy ? 'Sehat' : 'Perlu Perhatian'}
               </span>
             </div>
             <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
-              Saldo kas dan target simpanan
+              Posisi kas dan sasaran cadangan dana
             </p>
 
             {/* Inner Mint Box */}
@@ -247,7 +247,7 @@ export default function DashboardView({
 
             <div style={{ display: 'flex', gap: 8, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
               <Info size={15} style={{ flexShrink: 0, marginTop: 2, color: 'var(--brand-teal)' }} />
-              <span>Kelola dana operasional secara berkala agar pengeluaran tetap terpantau.</span>
+              <span>Jaga cadangan dana kas untuk kestabilan operasional bisnis.</span>
             </div>
           </div>
 
@@ -267,7 +267,7 @@ export default function DashboardView({
               marginTop: 12 
             }}
           >
-            <span>Lihat laporan lengkap</span>
+            <span>Lihat laporan kas</span>
             <ChevronRight size={15} />
           </button>
         </div>
@@ -278,7 +278,7 @@ export default function DashboardView({
         {/* Aktivitas Terbaru Card */}
         <div className="moneva-card" style={{ marginBottom: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Aktivitas terbaru</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)' }}>Aktivitas Terbaru</h3>
             <button 
               onClick={() => onNavigate('Input Journal')}
               style={{ background: 'none', border: 'none', color: 'var(--brand-teal)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
@@ -287,7 +287,7 @@ export default function DashboardView({
             </button>
           </div>
           <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
-            Catatan transaksi yang baru ditambahkan ke database
+            Riwayat transaksi jurnal terkini
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -323,7 +323,7 @@ export default function DashboardView({
               ))
             ) : (
               <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)', fontSize: 13 }}>
-                Belum ada transaksi di database. Klik <strong>Catat jurnal baru</strong> di samping untuk memulai.
+                Belum ada transaksi. Klik <strong>Catat Jurnal</strong> di atas untuk memulai.
               </div>
             )}
           </div>
@@ -331,9 +331,9 @@ export default function DashboardView({
 
         {/* Aksi Cepat Card (2x2 Grid) */}
         <div className="moneva-card" style={{ marginBottom: 0 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Aksi cepat</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 4 }}>Aksi Cepat</h3>
           <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
-            Biar urusan administrasi makin simpel
+            Pintasan menu dan transaksi
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

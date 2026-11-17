@@ -88,7 +88,7 @@ export default function AccountModal({
         <div className="modal-header">
           <div className="account-modal-header-title">
             <User size={20} className="text-teal" />
-            <h2 className="modal-title">Keterangan Akun Saya</h2>
+            <h2 className="modal-title">Keterangan Akun</h2>
           </div>
           <button className="icon-btn" onClick={onClose} title="Tutup">
             <X size={18} />
@@ -136,7 +136,7 @@ export default function AccountModal({
           {/* Form Keterangan Akun & Alamat */}
           <form onSubmit={handleSaveProfile} className="account-form">
             <div className="auth-field">
-              <label>Nama Bisnis / Pemilik Akun</label>
+              <label>Nama Bisnis / Nama Pemilik</label>
               <div className="auth-input-wrapper">
                 <Building2 size={16} className="auth-input-icon" />
                 <input
@@ -150,7 +150,7 @@ export default function AccountModal({
             </div>
 
             <div className="auth-field">
-              <label>Alamat Email Terdaftar</label>
+              <label>Alamat Email</label>
               <div className="auth-input-wrapper">
                 <Mail size={16} className="auth-input-icon" />
                 <input
@@ -163,19 +163,19 @@ export default function AccountModal({
             </div>
 
             <div className="auth-field">
-              <label>Alamat Akun / Lokasi Operasional Bisnis</label>
+              <label>Alamat Operasional Bisnis</label>
               <div className="auth-input-wrapper" style={{ alignItems: 'flex-start' }}>
                 <MapPin size={16} className="auth-input-icon" style={{ marginTop: '12px' }} />
                 <textarea
                   className="account-textarea"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Contoh: Jl. Boulevard Aster No. 25, Blok B4, Kel. Jatirasa, Kec. Jatiasih, Kota Bekasi 17424"
+                  placeholder="Contoh: Jl. Boulevard Aster No. 25, Kota Bekasi"
                   rows={3}
                 />
               </div>
               <span className="field-hint">
-                Alamat resmi akun ini akan terhubung dengan kop laporan dan invoice bisnis Anda.
+                Alamat resmi terhubung dengan kop laporan usaha.
               </span>
             </div>
 
@@ -186,7 +186,7 @@ export default function AccountModal({
               disabled={saving}
             >
               <Save size={16} />
-              <span>{saving ? 'Menyimpan...' : 'Simpan Keterangan Akun'}</span>
+              <span>{saving ? 'Menyimpan...' : 'Simpan Perubahan'}</span>
             </button>
           </form>
 
