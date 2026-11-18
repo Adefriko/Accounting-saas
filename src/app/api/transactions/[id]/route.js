@@ -2,6 +2,9 @@ import { initializeDatabase } from '@/db/schema';
 import { removeTransaction } from '@/backend/services/transactions.service';
 import { successResponse, errorResponse } from '@/backend/utils/response';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // DELETE /api/transactions/[id]
 export async function DELETE(request, { params }) {
   try {

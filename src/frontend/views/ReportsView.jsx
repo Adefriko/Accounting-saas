@@ -29,41 +29,24 @@ export default function ReportsView({
 }) {
   const [activeReportTab, setActiveReportTab] = useState('Laba Rugi'); // Laba Rugi | Neraca | Arus Kas | Buku Besar | Neraca Saldo
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   const handleExportCSV = () => {
-    let headers = [];
-    let rows = [];
-    let filename = `laporan_${activeReportTab.toLowerCase().replace(/\s+/g, '_')}.csv`;
+    let headers = [], rows = [];
+    const filename = `laporan_${activeReportTab.toLowerCase().replace(/\s+/g, '_')}.csv`;
 
     if (activeReportTab === 'Laba Rugi' && incomeStatementData?.rows) {
       headers = ['Kategori', ...incomeStatementData.months];
-      rows = incomeStatementData.rows.map(r => [
-        `"${r.Kategori}"`,
-        ...incomeStatementData.months.map(m => r[m])
-      ]);
+      rows = incomeStatementData.rows.map(r => [`"${r.Kategori}"`, ...incomeStatementData.months.map(m => r[m])]);
     } else if (activeReportTab === 'Neraca' && balanceSheetData?.rows) {
       headers = ['Akun / Klasifikasi', ...balanceSheetData.months];
-      rows = balanceSheetData.rows.filter(r => !r.is_spacer).map(r => [
-        `"${r.Account.trim()}"`,
-        ...balanceSheetData.months.map(m => r[m] || 0)
-      ]);
+      rows = balanceSheetData.rows.filter(r => !r.is_spacer).map(r => [`"${r.Account.trim()}"`, ...balanceSheetData.months.map(m => r[m] || 0)]);
     } else if (activeReportTab === 'Arus Kas' && cashflowData?.rows) {
       headers = ['Kategori Aliran Kas', ...cashflowData.months];
-      rows = cashflowData.rows.map(r => [
-        `"${r.Kategori}"`,
-        ...cashflowData.months.map(m => r[m])
-      ]);
+      rows = cashflowData.rows.map(r => [`"${r.Kategori}"`, ...cashflowData.months.map(m => r[m])]);
     } else if (activeReportTab === 'Neraca Saldo' && trialBalanceData?.entries) {
       headers = ['Akun Keuangan', 'Tipe', 'Debit', 'Kredit'];
-      rows = trialBalanceData.entries.map(e => [
-        `"${e.account}"`,
-        e.type,
-        e.debit,
-        e.credit
-      ]);
+      rows = trialBalanceData.entries.map(e => [`"${e.account}"`, e.type, e.debit, e.credit]);
     }
 
     if (headers.length > 0) {
@@ -281,23 +264,31 @@ export default function ReportsView({
                 </tr>
               </thead>
               <tbody>
-                {balanceSheetData?.rows?.map((row, i) => {
-                  if (row.is_spacer) return <tr key={i}><td colSpan={13} style={{ height: 12, padding: 0, border: 'none' }} /></tr>;
-                  return (
-                    <tr key={i} style={{ 
-                      fontWeight: row.is_header || row.is_total ? 700 : 400,
-                      background: row.is_total ? '#f8fafc' : 'transparent',
-                      color: row.is_header ? 'var(--brand-teal)' : 'var(--text-dark)'
-                    }}>
-                      <td>{row.Account}</td>
-                      {balanceSheetData.months.map(m => (
-                        <td key={m} className="text-right">
-                          {row.is_header ? '' : (row[m] === 0 ? '-' : formatRupiah(row[m]))}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
+                {(!balanceSheetData || balanceSheetData.empty || !balanceSheetData?.rows?.length) ? (
+                  <tr>
+                    <td colSpan={13} style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
+                      Belum ada data neraca keuangan di database.
+                    </td>
+                  </tr>
+                ) : (
+                  balanceSheetData.rows.map((row, i) => {
+                    if (row.is_spacer) return <tr key={i}><td colSpan={13} style={{ height: 12, padding: 0, border: 'none' }} /></tr>;
+                    return (
+                      <tr key={i} style={{ 
+                        fontWeight: row.is_header || row.is_total ? 700 : 400,
+                        background: row.is_total ? '#f8fafc' : 'transparent',
+                        color: row.is_header ? 'var(--brand-teal)' : 'var(--text-dark)'
+                      }}>
+                        <td>{row.Account}</td>
+                        {balanceSheetData.months.map(m => (
+                          <td key={m} className="text-right">
+                            {row.is_header ? '' : (row[m] === 0 ? '-' : formatRupiah(row[m]))}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
@@ -338,14 +329,22 @@ export default function ReportsView({
                 </tr>
               </thead>
               <tbody>
-                {cashflowData?.rows?.map((row, i) => (
-                  <tr key={i} style={{ fontWeight: row.Kategori === 'Net Cashflow' ? 700 : 500, background: row.Kategori === 'Net Cashflow' ? 'var(--bg-teal-subtle)' : 'transparent' }}>
-                    <td style={{ color: row.Kategori === 'Net Cashflow' ? 'var(--brand-teal)' : 'var(--text-dark)' }}>{row.Kategori}</td>
-                    {cashflowData.months.map(m => (
-                      <td key={m} className="text-right">{formatRupiah(row[m])}</td>
-                    ))}
+                {(!cashflowData || cashflowData.empty || !cashflowData?.rows?.length) ? (
+                  <tr>
+                    <td colSpan={14} style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)' }}>
+                      Belum ada data arus kas di database.
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  cashflowData.rows.map((row, i) => (
+                    <tr key={i} style={{ fontWeight: row.Kategori === 'Net Cashflow' ? 700 : 500, background: row.Kategori === 'Net Cashflow' ? 'var(--bg-teal-subtle)' : 'transparent' }}>
+                      <td style={{ color: row.Kategori === 'Net Cashflow' ? 'var(--brand-teal)' : 'var(--text-dark)' }}>{row.Kategori}</td>
+                      {cashflowData.months.map(m => (
+                        <td key={m} className="text-right">{formatRupiah(row[m])}</td>
+                      ))}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

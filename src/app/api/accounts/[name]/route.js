@@ -2,6 +2,9 @@ import { initializeDatabase } from '@/db/schema';
 import { removeAccount } from '@/backend/services/accounts.service';
 import { successResponse, errorResponse } from '@/backend/utils/response';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // DELETE /api/accounts/[name]
 export async function DELETE(request, { params }) {
   try {

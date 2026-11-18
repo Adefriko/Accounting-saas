@@ -53,4 +53,5 @@ export async function queryResetDatabase() {
   const sql = getDb();
   await sql`DELETE FROM transactions`;
   await sql`DELETE FROM accounts`;
+  await sql`DELETE FROM recurring_rules`;
 }

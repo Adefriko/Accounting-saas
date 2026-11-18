@@ -328,11 +328,13 @@ export function calculateIncomeStatementData(transactions, accounts) {
 /**
  * 5. Kalkulasi Neraca (Balance Sheet)
  */
-export function calculateBalanceSheetData(transactions, accounts) {
-  if (!transactions.length || !accounts.length) return { empty: true };
+export function calculateBalanceSheetData(transactions = [], accounts = []) {
+  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  if (!transactions.length || !accounts.length) {
+    return { empty: true, months: MONTHS, rows: [] };
+  }
 
   const accTypes = buildAccountTypeMap(accounts);
-  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
   const assetAccs = accounts.filter(a => a.type === 'Asset').map(a => a.account);
   const liabAccs = accounts.filter(a => a.type === 'Liability').map(a => a.account);
@@ -418,14 +420,18 @@ export function calculateBalanceSheetData(transactions, accounts) {
 /**
  * 6. Kalkulasi Arus Kas (Cashflow Statement)
  */
-export function calculateCashflowData(transactions, accounts, selectedAccount) {
-  if (!transactions.length || !accounts.length) return { empty: true };
+export function calculateCashflowData(transactions = [], accounts = [], selectedAccount = '') {
+  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  if (!transactions.length || !accounts.length) {
+    return { empty: true, months: [...MONTHS, 'Full Year'], rows: [], available_accounts: [] };
+  }
 
   const assetAccounts = accounts.filter(a => a.type === 'Asset').map(a => a.account);
-  if (!assetAccounts.length) return { empty: true, error: 'Belum ada akun bertipe Asset' };
+  if (!assetAccounts.length) {
+    return { empty: true, months: [...MONTHS, 'Full Year'], rows: [], available_accounts: [], error: 'Belum ada akun bertipe Asset' };
+  }
 
   const selected = assetAccounts.includes(selectedAccount) ? selectedAccount : assetAccounts[0];
-  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
   const grid = {
     'Cash In (Uang Masuk)': {},

@@ -121,11 +121,12 @@ export default function HomePage() {
 
   const fetchReports = useCallback(async () => {
     try {
+      const ts = Date.now();
       const [isRes, bsRes, tbRes, cfRes] = await Promise.all([
-        fetch('/api/income-statement', { headers: getAuthHeaders() }),
-        fetch('/api/balance-sheet', { headers: getAuthHeaders() }),
-        fetch('/api/trial-balance', { headers: getAuthHeaders() }),
-        fetch(cashflowAccount ? `/api/cashflow?account=${encodeURIComponent(cashflowAccount)}` : '/api/cashflow', { headers: getAuthHeaders() })
+        fetch(`/api/income-statement?t=${ts}`, { headers: getAuthHeaders(), cache: 'no-store' }),
+        fetch(`/api/balance-sheet?t=${ts}`, { headers: getAuthHeaders(), cache: 'no-store' }),
+        fetch(`/api/trial-balance?t=${ts}`, { headers: getAuthHeaders(), cache: 'no-store' }),
+        fetch(cashflowAccount ? `/api/cashflow?account=${encodeURIComponent(cashflowAccount)}&t=${ts}` : `/api/cashflow?t=${ts}`, { headers: getAuthHeaders(), cache: 'no-store' })
       ]);
       if (isRes.ok) setIncomeStatementData(await isRes.json());
       if (bsRes.ok) setBalanceSheetData(await bsRes.json());
@@ -139,11 +140,15 @@ export default function HomePage() {
   }, [cashflowAccount, getAuthHeaders]);
 
   const fetchLedger = useCallback(async (accName) => {
-    if (!accName) return;
+    if (!accName) {
+      setLedgerData(null);
+      return;
+    }
     try {
-      const res = await fetch(`/api/ledger?account=${encodeURIComponent(accName)}`, { headers: getAuthHeaders() });
+      const res = await fetch(`/api/ledger?account=${encodeURIComponent(accName)}&t=${Date.now()}`, { headers: getAuthHeaders(), cache: 'no-store' });
       if (res.ok) setLedgerData(await res.json());
-    } catch { console.error('Error fetching ledger'); }
+      else setLedgerData(null);
+    } catch { setLedgerData(null); }
   }, [getAuthHeaders]);
 
   useEffect(() => {
@@ -166,7 +171,12 @@ export default function HomePage() {
       if (accounts.length > 0 && !ledgerAccount) {
         setLedgerAccount(accounts[0].account);
         fetchLedger(accounts[0].account);
-      } else if (ledgerAccount) { fetchLedger(ledgerAccount); }
+      } else if (accounts.length > 0 && ledgerAccount) {
+        fetchLedger(ledgerAccount);
+      } else {
+        setLedgerAccount('');
+        setLedgerData(null);
+      }
     }
   }, [currentUser, activeMenu, ledgerAccount, cashflowAccount, accounts.length, fetchAccounts, fetchTransactions, fetchDashboard, fetchRecurringRules, fetchReports, fetchLedger]);
 
@@ -175,7 +185,11 @@ export default function HomePage() {
     try {
       const res = await fetch('/api/accounts', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload) });
       const data = await res.json();
-      if (res.ok) { addToast(data.message); await fetchAccounts(); await fetchDashboard(); return true; }
+      if (res.ok) {
+        addToast(data.message);
+        await Promise.all([fetchAccounts(), fetchDashboard(), fetchReports()]);
+        return true;
+      }
       addToast(data.error || 'Gagal menambah akun', 'error'); return false;
     } catch { addToast('Kesalahan server', 'error'); return false; }
   };
@@ -184,8 +198,10 @@ export default function HomePage() {
     try {
       const res = await fetch('/api/accounts', { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ action: 'seed' }) });
       const data = await res.json();
-      if (res.ok) { addToast(data.message); await fetchAccounts(); await fetchDashboard(); }
-      else addToast(data.error || 'Gagal menambahkan akun standar', 'error');
+      if (res.ok) {
+        addToast(data.message);
+        await Promise.all([fetchAccounts(), fetchDashboard(), fetchReports()]);
+      } else addToast(data.error || 'Gagal menambahkan akun standar', 'error');
     } catch { addToast('Kesalahan server', 'error'); }
   };
 
@@ -194,8 +210,10 @@ export default function HomePage() {
     try {
       const res = await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: 'DELETE', headers: getAuthHeaders() });
       const data = await res.json();
-      if (res.ok) { addToast(data.message); await fetchAccounts(); await fetchDashboard(); }
-      else addToast(data.error || 'Gagal menghapus akun', 'error');
+      if (res.ok) {
+        addToast(data.message);
+        await Promise.all([fetchAccounts(), fetchDashboard(), fetchReports()]);
+      } else addToast(data.error || 'Gagal menghapus akun', 'error');
     } catch { addToast('Kesalahan server', 'error'); }
   };
 
@@ -205,7 +223,7 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard()]);
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchReports()]);
         return true;
       }
       addToast(data.error || 'Gagal menyimpan transaksi', 'error'); return false;
@@ -217,8 +235,10 @@ export default function HomePage() {
     try {
       const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
       const data = await res.json();
-      if (res.ok) { addToast(data.message); await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard()]); }
-      else addToast(data.error || 'Gagal menghapus', 'error');
+      if (res.ok) {
+        addToast(data.message);
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchReports()]);
+      } else addToast(data.error || 'Gagal menghapus', 'error');
     } catch { addToast('Kesalahan server', 'error'); }
   };
 
@@ -248,7 +268,7 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchRecurringRules()]);
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchRecurringRules(), fetchReports()]);
       } else addToast(data.error || 'Gagal mengeksekusi', 'error');
     } catch { addToast('Kesalahan server', 'error'); }
   };
@@ -259,7 +279,7 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchRecurringRules()]);
+        await Promise.all([fetchTransactions(), fetchAccounts(), fetchDashboard(), fetchRecurringRules(), fetchReports()]);
       } else addToast(data.error || 'Gagal mengeksekusi rutin', 'error');
     } catch { addToast('Kesalahan server', 'error'); }
   };
@@ -280,7 +300,20 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         addToast(data.message);
-        await Promise.all([fetchAccounts(), fetchTransactions(), fetchDashboard(), fetchRecurringRules()]);
+        setIncomeStatementData(null);
+        setBalanceSheetData(null);
+        setTrialBalanceData(null);
+        setCashflowData(null);
+        setLedgerData(null);
+        setCashflowAccount('');
+        setLedgerAccount('');
+        await Promise.all([
+          fetchAccounts(),
+          fetchTransactions(),
+          fetchDashboard(),
+          fetchRecurringRules(),
+          fetchReports()
+        ]);
         setActiveMenu('Dashboard');
       } else addToast(data.error || 'Gagal melakukan reset', 'error');
     } catch { addToast('Kesalahan server', 'error'); }

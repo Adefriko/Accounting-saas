@@ -4,6 +4,9 @@ import { getAllTransactions } from '@/backend/services/transactions.service';
 import { calculateBalanceSheetData } from '@/backend/services/accounting.service';
 import { successResponse, errorResponse } from '@/backend/utils/response';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/balance-sheet
 export async function GET() {
   try {
