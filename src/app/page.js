@@ -430,7 +430,7 @@ export default function HomePage() {
         )}
       </main>
 
-      <Footer />
+      <Footer onNavigate={setActiveMenu} />
     </div>
   );
 }
