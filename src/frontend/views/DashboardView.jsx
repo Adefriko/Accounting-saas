@@ -17,7 +17,7 @@ import {
   Zap
 } from 'lucide-react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { formatRupiah } from '@/frontend/utils/formatters';
 
@@ -181,34 +181,41 @@ export default function DashboardView({
             Tren pemasukan dan pengeluaran berkala
           </p>
 
-          <div style={{ width: '100%', height: 230 }}>
+          <div style={{ width: '100%', height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="pemasukanGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#007a64" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#007a64" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="pengeluaranGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }} barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                <XAxis 
+                  dataKey="name" 
+                  tickLine={false} 
+                  axisLine={{ stroke: '#e2e8f0' }} 
+                  tick={{ fill: '#64748b', fontSize: 11, fontWeight: 500 }} 
+                />
                 <YAxis 
                   tickLine={false} 
                   axisLine={false} 
-                  tick={{ fill: '#94a3b8', fontSize: 11 }}
+                  tick={{ fill: '#64748b', fontSize: 11 }}
                   tickFormatter={v => v >= 1000000 ? `${(v / 1000000).toFixed(0)} jt` : v} 
                 />
                 <Tooltip 
-                  formatter={(val) => formatRupiah(val)}
-                  contentStyle={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+                  formatter={(val, name) => [formatRupiah(val), name === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran']}
+                  contentStyle={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.06)', fontSize: 12 }}
                 />
-                <Area type="monotone" dataKey="pemasukan" stroke="#007a64" strokeWidth={2.5} fillOpacity={1} fill="url(#pemasukanGrad)" />
-                <Area type="monotone" dataKey="pengeluaran" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#pengeluaranGrad)" />
-              </AreaChart>
+                <Bar 
+                  dataKey="pemasukan" 
+                  name="pemasukan" 
+                  fill="#006d5b" 
+                  radius={[4, 4, 0, 0]} 
+                  maxBarSize={28} 
+                />
+                <Bar 
+                  dataKey="pengeluaran" 
+                  name="pengeluaran" 
+                  fill="#ea580c" 
+                  radius={[4, 4, 0, 0]} 
+                  maxBarSize={28} 
+                />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -287,46 +294,55 @@ export default function DashboardView({
             </button>
           </div>
           <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
-            Riwayat transaksi jurnal terkini
+            Riwayat transaksi jurnal terkini yang tersimpan di sistem
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {recentTransactions.length > 0 ? (
-              recentTransactions.map(tx => (
-                <div key={tx.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ 
-                      width: 36, 
-                      height: 36, 
-                      borderRadius: '50%', 
-                      background: 'var(--bg-teal-subtle)', 
-                      color: 'var(--brand-teal)', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center' 
-                    }}>
-                      <TrendingUp size={16} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-dark)' }}>
-                        {tx.description || `${tx.debit} ➔ ${tx.credit}`}
-                      </div>
-                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                        {tx.date} · [D] {tx.debit} ➔ [K] {tx.credit}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--brand-teal)' }}>
-                    + {formatRupiah(tx.amount)}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)', fontSize: 13 }}>
-                Belum ada transaksi. Klik <strong>Catat Jurnal</strong> di atas untuk memulai.
-              </div>
-            )}
-          </div>
+          {recentTransactions.length > 0 ? (
+            <div className="table-container">
+              <table className="moneva-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Keterangan</th>
+                    <th>Debit ➔ Kredit</th>
+                    <th className="text-right">Nominal</th>
+                    <th className="text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentTransactions.map(tx => (
+                    <tr key={tx.id}>
+                      <td style={{ fontWeight: 500, color: 'var(--text-secondary)', fontSize: 12 }}>
+                        {tx.date}
+                      </td>
+                      <td style={{ fontWeight: 600, color: 'var(--text-dark)' }}>
+                        {tx.description || 'Transaksi Operasional'}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+                          <span style={{ color: '#006d5b', fontWeight: 600 }}>{tx.debit}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>➔</span>
+                          <span style={{ color: '#ea580c', fontWeight: 600 }}>{tx.credit}</span>
+                        </div>
+                      </td>
+                      <td className="text-right" style={{ fontWeight: 700, color: 'var(--text-dark)' }}>
+                        {formatRupiah(tx.amount)}
+                      </td>
+                      <td className="text-center">
+                        <span className="status-pill status-pill-active">
+                          <span className="dot-indicator"></span> Tercatat
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+              Belum ada transaksi. Klik <strong>Catat Jurnal</strong> di atas untuk memulai pencatatan.
+            </div>
+          )}
         </div>
 
         {/* Aksi Cepat Card (2x2 Grid) */}

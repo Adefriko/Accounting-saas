@@ -244,8 +244,8 @@ export default function JournalView({
         </div>
       </div>
 
-      {/* MODAL: Buat Jurnal Baru */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Buat Jurnal Baru">
+      {/* MODAL: Catat Jurnal Umum Baru (Figma Spec) */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Catat Jurnal Umum Baru">
         {accounts.length === 0 ? (
           <div className="modal-body" style={{ textAlign: 'center', padding: '30px 20px' }}>
             <AlertCircle size={36} style={{ color: 'var(--brand-orange)', margin: '0 auto 12px' }} />
@@ -264,6 +264,10 @@ export default function JournalView({
         ) : (
           <form onSubmit={handleFormSubmit}>
             <div className="modal-body">
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: -6, marginBottom: 12 }}>
+                Pencatatan berpasangan standar. Pastikan mutasi debit dan kredit merefleksikan transaksi riil.
+              </p>
+
               <div className="form-group">
                 <label className="form-label">Tanggal Transaksi</label>
                 <input
@@ -277,7 +281,7 @@ export default function JournalView({
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div className="form-group">
-                  <label className="form-label" style={{ color: '#059669' }}>Akun Debit (+)</label>
+                  <label className="form-label" style={{ color: '#006d5b' }}>Akun Debit (+)</label>
                   <select
                     className="form-select-moneva"
                     value={newTx.debit || (accounts[0] ? accounts[0].account : '')}
@@ -290,7 +294,7 @@ export default function JournalView({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" style={{ color: '#ea580c' }}>Akun Credit (-)</label>
+                  <label className="form-label" style={{ color: '#ea580c' }}>Akun Kredit (-)</label>
                   <select
                     className="form-select-moneva"
                     value={newTx.credit || (accounts[1] ? accounts[1].account : accounts[0]?.account)}
@@ -312,7 +316,32 @@ export default function JournalView({
                   value={newTx.amount}
                   onChange={e => setNewTx({ ...newTx, amount: e.target.value })}
                   required
+                  min="1"
                 />
+              </div>
+
+              {/* Live Balanced Status Indicator (Figma Reference) */}
+              <div style={{ 
+                background: newTx.amount ? '#e6f4f1' : '#f8fafc', 
+                border: `1px solid ${newTx.amount ? '#ccede6' : '#e2e8f0'}`, 
+                borderRadius: 'var(--radius-sm)', 
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: 12
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: newTx.amount ? '#006d5b' : 'var(--text-secondary)' }}>
+                  <CheckCircle2 size={15} style={{ color: newTx.amount ? '#006d5b' : 'var(--text-muted)' }} />
+                  <span style={{ fontWeight: 600 }}>
+                    {newTx.amount ? 'Status Jurnal: Seimbang (Balanced)' : 'Status: Menunggu input nominal'}
+                  </span>
+                </div>
+                {newTx.amount && (
+                  <span style={{ fontWeight: 700, color: '#004d40' }}>
+                    {formatRupiah(Number(newTx.amount) || 0)}
+                  </span>
+                )}
               </div>
 
               <div className="form-group">

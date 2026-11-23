@@ -89,153 +89,211 @@ export default function AuthScreen({ onLoginSuccess }) {
 
   return (
     <div className="auth-wrapper">
-      <div className="auth-card">
-        {/* Brand Header */}
-        <div className="auth-header">
-          <div className="auth-brand-badge">
-            <div className="brand-icon-moneva">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
-              </svg>
+      <div className="auth-split-container">
+        {/* Left Showcase Panel (Figma Design Spec) */}
+        <div className="auth-showcase-panel">
+          <div className="auth-showcase-top">
+            <div className="auth-showcase-brand">
+              <div className="brand-icon-moneva">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
+                </svg>
+              </div>
+              <span className="brand-name-moneva" style={{ fontSize: '1.4rem' }}>moneva</span>
             </div>
-            <span className="brand-name-moneva" style={{ fontSize: '1.4rem' }}>moneva</span>
+
+            <div>
+              <h2 className="auth-showcase-heading">
+                Kelola keuangan usaha Anda dengan lebih tenang &amp; terkontrol
+              </h2>
+              <p className="auth-showcase-desc" style={{ marginTop: '10px' }}>
+                Sistem pembukuan dan akuntansi modern untuk UMKM. Pantau laba rugi, posisi kas, dan neraca dalam satu layar.
+              </p>
+            </div>
+
+            {/* Mini Financial Growth Sparkline Preview */}
+            <div className="auth-preview-card">
+              <div className="auth-preview-header">
+                <span className="auth-preview-label">Ringkasan Arus Kas</span>
+                <span className="auth-preview-trend">▲ +14.2% MoM</span>
+              </div>
+              <div className="auth-preview-value">Rp 128.500.000</div>
+              <div className="auth-preview-chart-sim">
+                <div className="preview-bar" style={{ height: '40%' }}></div>
+                <div className="preview-bar" style={{ height: '55%' }}></div>
+                <div className="preview-bar" style={{ height: '50%' }}></div>
+                <div className="preview-bar" style={{ height: '70%' }}></div>
+                <div className="preview-bar" style={{ height: '65%' }}></div>
+                <div className="preview-bar" style={{ height: '85%' }}></div>
+                <div className="preview-bar" style={{ height: '75%' }}></div>
+                <div className="preview-bar" style={{ height: '100%' }}></div>
+              </div>
+            </div>
+
+            {/* 3 Value Points */}
+            <div className="auth-features-list">
+              <div className="auth-feature-item">
+                <span className="auth-feature-check">✓</span>
+                <span>Pencatatan Jurnal Otomatis &amp; Selalu Seimbang</span>
+              </div>
+              <div className="auth-feature-item">
+                <span className="auth-feature-check">✓</span>
+                <span>Laporan Laba Rugi, Neraca, &amp; Arus Kas Real-time</span>
+              </div>
+              <div className="auth-feature-item">
+                <span className="auth-feature-check">✓</span>
+                <span>100% Sesuai Standar Akuntansi Keuangan</span>
+              </div>
+            </div>
           </div>
-          <h1 className="auth-title">
-            {mode === 'login' ? 'Masuk ke Moneva' : 'Buat Akun Bisnis'}
-          </h1>
-          <p className="auth-subtitle">
-            Kelola keuangan usaha jadi lebih mudah dan teratur.
-          </p>
-        </div>
 
-        {/* Tab Switcher */}
-        <div className="auth-tabs">
-          <button
-            type="button"
-            className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => { setMode('login'); setErrorMsg(''); }}
-          >
-            Masuk
-          </button>
-          <button
-            type="button"
-            className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => { setMode('register'); setErrorMsg(''); }}
-          >
-            Daftar Baru
-          </button>
-        </div>
-
-        {/* Error Alert */}
-        {errorMsg && (
-          <div className="auth-error-box">
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {/* Google Sign In Button */}
-        <div className="auth-social-section">
-          <button
-            type="button"
-            className="btn-google-auth"
-            onClick={() => setGoogleModal(true)}
-            disabled={loading}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-            </svg>
-            <span>Lanjutkan dengan Google</span>
-          </button>
-
-          <div className="auth-divider">
-            <span>atau masuk dengan email</span>
+          <div style={{ fontSize: '11.5px', color: '#006d5b', opacity: 0.8, paddingTop: '20px' }}>
+            © Moneva Accounting Platform. Hak Cipta Dilindungi.
           </div>
         </div>
 
-        {/* Form Fields with Slide Transition */}
-        <form key={mode} onSubmit={handleSubmit} className="auth-form tab-slide-enter">
-          {mode === 'register' && (
+        {/* Right Form Card */}
+        <div className="auth-form-card">
+          <div className="auth-header">
+            <h1 className="auth-title">
+              {mode === 'login' ? 'Masuk ke Moneva' : 'Buat Akun Bisnis'}
+            </h1>
+            <p className="auth-subtitle">
+              {mode === 'login' 
+                ? 'Kelola keuangan usaha jadi lebih mudah dan teratur.' 
+                : 'Mulai pembukuan rapi untuk bisnis Anda dalam hitungan menit.'}
+            </p>
+          </div>
+
+          {/* Tab Switcher */}
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
+              onClick={() => { setMode('login'); setErrorMsg(''); }}
+            >
+              Masuk
+            </button>
+            <button
+              type="button"
+              className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
+              onClick={() => { setMode('register'); setErrorMsg(''); }}
+            >
+              Daftar Baru
+            </button>
+          </div>
+
+          {/* Error Alert */}
+          {errorMsg && (
+            <div className="auth-error-box">
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {/* Google Sign In Button */}
+          <div className="auth-social-section">
+            <button
+              type="button"
+              className="btn-google-auth"
+              onClick={() => setGoogleModal(true)}
+              disabled={loading}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span>Lanjutkan dengan Google</span>
+            </button>
+
+            <div className="auth-divider">
+              <span>atau masuk dengan email</span>
+            </div>
+          </div>
+
+          {/* Form Fields with Slide Transition */}
+          <form key={mode} onSubmit={handleSubmit} className="auth-form tab-slide-enter">
+            {mode === 'register' && (
+              <div className="auth-field">
+                <label>Nama Lengkap / Nama Bisnis</label>
+                <div className="auth-input-wrapper">
+                  <User size={18} className="auth-input-icon" />
+                  <input
+                    type="text"
+                    placeholder="Contoh: Taman Aster Shoes"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="auth-field">
-              <label>Nama Lengkap / Nama Bisnis</label>
+              <label>Alamat Email</label>
               <div className="auth-input-wrapper">
-                <User size={18} className="auth-input-icon" />
+                <Mail size={18} className="auth-input-icon" />
                 <input
-                  type="text"
-                  placeholder="Contoh: Taman Aster Shoes"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  type="email"
+                  placeholder="nama@bisnis.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
             </div>
-          )}
 
-          <div className="auth-field">
-            <label>Alamat Email</label>
-            <div className="auth-input-wrapper">
-              <Mail size={18} className="auth-input-icon" />
-              <input
-                type="email"
-                placeholder="nama@bisnis.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <div className="auth-field">
+              <label>Kata Sandi</label>
+              <div className="auth-input-wrapper">
+                <Lock size={18} className="auth-input-icon" />
+                <input
+                  type="password"
+                  placeholder="Minimal 6 karakter"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="auth-field">
-            <label>Kata Sandi</label>
-            <div className="auth-input-wrapper">
-              <Lock size={18} className="auth-input-icon" />
-              <input
-                type="password"
-                placeholder="Minimal 6 karakter"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <button
+              type="submit"
+              className="btn-auth-submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <span>Memproses...</span>
+              ) : (
+                <>
+                  <span>{mode === 'login' ? 'Masuk ke Moneva' : 'Daftar Akun Baru'}</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Demo Fast Track Button */}
+          <div className="auth-demo-box">
+            <div className="demo-header">
+              <Sparkles size={16} className="text-teal" />
+              <span>Akses Cepat Pengujian:</span>
             </div>
+            <button
+              type="button"
+              className="btn-demo-quick"
+              onClick={handleDemoLogin}
+              disabled={loading}
+            >
+              Coba Akun Demo Langsung (1-Klik)
+            </button>
           </div>
 
-          <button
-            type="submit"
-            className="btn-auth-submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <span>Memproses...</span>
-            ) : (
-              <>
-                <span>{mode === 'login' ? 'Masuk ke Moneva' : 'Daftar Akun Baru'}</span>
-                <ArrowRight size={18} />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Demo Fast Track Button */}
-        <div className="auth-demo-box">
-          <div className="demo-header">
-            <Sparkles size={16} className="text-teal" />
-            <span>Mode Demo:</span>
+          <div className="auth-footer-note">
+            <ShieldCheck size={14} />
+            <span>Tersimpan aman &amp; terenkripsi di Neon Cloud Database</span>
           </div>
-          <button
-            type="button"
-            className="btn-demo-quick"
-            onClick={handleDemoLogin}
-            disabled={loading}
-          >
-            Coba Akun Demo (1-Klik)
-          </button>
-        </div>
-
-        <div className="auth-footer-note">
-          <ShieldCheck size={14} />
-          <span>Tersimpan aman & terenkripsi</span>
         </div>
       </div>
 

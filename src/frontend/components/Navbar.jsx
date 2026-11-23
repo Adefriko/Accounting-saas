@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -7,7 +8,9 @@ import {
   Zap,
   TrendingUp, 
   LogOut, 
-  UserCircle2
+  UserCircle2,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -17,6 +20,8 @@ export default function Navbar({
   onLogout,
   onOpenAccount 
 }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const navItems = [
     { id: 'Dashboard', label: 'Beranda', icon: LayoutDashboard },
     { id: 'Chart of Accounts', label: 'Daftar Akun', icon: BookOpen },
@@ -34,11 +39,16 @@ export default function Navbar({
         .toUpperCase()
     : 'U';
 
+  const handleMenuClick = (id) => {
+    onSelectMenu(id);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <header className="topbar">
       <div className="topbar-content">
         {/* Brand Logo */}
-        <div className="brand-wrapper" onClick={() => onSelectMenu('Dashboard')}>
+        <div className="brand-wrapper" onClick={() => handleMenuClick('Dashboard')}>
           <div className="brand-icon-moneva">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14" />
@@ -47,8 +57,8 @@ export default function Navbar({
           <span className="brand-name-moneva">moneva</span>
         </div>
 
-        {/* Navigation Pills */}
-        <nav className="nav-pills">
+        {/* Desktop Navigation Pills */}
+        <nav className="nav-pills" aria-label="Navigasi Utama">
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activeMenu === item.id || (item.id === 'Laporan Keuangan' && [
@@ -58,8 +68,9 @@ export default function Navbar({
             return (
               <button
                 key={item.id}
-                onClick={() => onSelectMenu(item.id)}
+                onClick={() => handleMenuClick(item.id)}
                 className={`nav-pill-btn ${isActive ? 'active' : ''}`}
+                style={{ minHeight: '44px' }}
               >
                 <Icon size={16} />
                 <span>{item.label}</span>
@@ -68,13 +79,14 @@ export default function Navbar({
           })}
         </nav>
 
-        {/* Right Section: 1 Single Unified User Profile */}
+        {/* Right Section: 1 Single Unified User Profile + Mobile Hamburger */}
         <div className="topbar-right">
           {/* Single Account Badge (Opens "Keterangan Akun Saya") */}
           <div 
             className="workspace-badge single-account-badge" 
             onClick={onOpenAccount}
             title="Klik untuk membuka Keterangan Akun Saya & Alamat Bisnis"
+            style={{ minHeight: '44px' }}
           >
             <div className="workspace-avatar">
               {currentUser?.avatar ? (
@@ -106,12 +118,45 @@ export default function Navbar({
               className="icon-btn btn-logout" 
               onClick={onLogout}
               title="Keluar / Logout"
+              aria-label="Keluar dari akun"
+              style={{ minWidth: '44px', minHeight: '44px' }}
             >
               <LogOut size={16} />
             </button>
           )}
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(prev => !prev)}
+            aria-label={mobileMenuOpen ? 'Tutup navigasi mobile' : 'Buka navigasi mobile'}
+            style={{ minWidth: '44px', minHeight: '44px' }}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <nav className="mobile-nav-drawer" aria-label="Navigasi Menu Mobile">
+          {navItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activeMenu === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleMenuClick(item.id)}
+                className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+                style={{ minHeight: '44px' }}
+              >
+                <Icon size={18} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
     </header>
   );
 }

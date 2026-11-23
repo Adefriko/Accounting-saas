@@ -239,15 +239,19 @@ export default function AccountsView({
         </button>
       </div>
 
-      {/* MODAL: Tambah Akun Baru */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Tambah Akun Baru">
+      {/* MODAL: Tambah Akun Keuangan Baru (Figma Spec) */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Tambah Akun Keuangan Baru">
         <form onSubmit={handleFormSubmit}>
           <div className="modal-body">
+            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: -6, marginBottom: 12 }}>
+              Akun baru akan otomatis masuk ke dalam bagan akun dan dapat langsung digunakan pada transaksi jurnal.
+            </p>
+
             <div className="form-group">
-              <label className="form-label">Nama Akun</label>
+              <label className="form-label">Nama Akun Keuangan</label>
               <input
                 type="text"
-                placeholder="Contoh: Kas Utama, Bank BCA, Piutang Usaha..."
+                placeholder="Contoh: Kas Operasional, Bank BCA, Piutang Dagang..."
                 className="form-input-moneva"
                 value={newAccount.account}
                 onChange={e => setNewAccount({ ...newAccount, account: e.target.value })}
@@ -257,18 +261,18 @@ export default function AccountsView({
             </div>
 
             <div className="form-group">
-              <label className="form-label">Kategori / Tipe Akun</label>
+              <label className="form-label">Kategori / Klasifikasi Akun</label>
               <select
                 className="form-select-moneva"
                 value={newAccount.type}
                 onChange={e => setNewAccount({ ...newAccount, type: e.target.value })}
               >
                 <option value="Asset">Asset (Aset / Harta / Kas / Bank)</option>
-                <option value="Liability">Liability (Liabilitas / Utang)</option>
-                <option value="Equity">Equity (Ekuitas / Modal)</option>
-                <option value="Revenue">Revenue (Pendapatan)</option>
-                <option value="COGS">COGS (Harga Pokok Penjualan)</option>
-                <option value="Expense">Expense (Beban Usaha / Operasional)</option>
+                <option value="Liability">Liability (Kewajiban / Utang Usaha)</option>
+                <option value="Equity">Equity (Ekuitas / Modal Pemilik)</option>
+                <option value="Revenue">Revenue (Pendapatan Usaha)</option>
+                <option value="COGS">COGS (Harga Pokok Penjualan / HPP)</option>
+                <option value="Expense">Expense (Beban Operasional &amp; Usaha)</option>
               </select>
             </div>
           </div>
@@ -278,7 +282,7 @@ export default function AccountsView({
               Batal
             </button>
             <button type="submit" className="btn-moneva-primary">
-              Simpan Akun ke Database
+              Simpan Akun
             </button>
           </div>
         </form>
